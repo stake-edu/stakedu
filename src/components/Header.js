@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Container, Row, Col, Button, Dropdown, DropdownButton, ButtonGroup } from 'react-bootstrap'
-import { Flow } from "../components/Layout"
+import { Flow } from "./Layout"
 
 import { shortenAccount, getAccount } from "../web3/utils"
 
@@ -44,7 +44,7 @@ export default class Header extends React.Component {
 
     connect = () => {
         ethereum.request({ method: 'eth_requestAccounts' }).then(accounts => {
-            let account = accounts.length > 0? accounts[0] : undefined
+            let account = accounts.length > 0 ? accounts[0] : undefined
             this.reload()
             this.handleAccount(account)
         })
@@ -116,10 +116,10 @@ export default class Header extends React.Component {
                         <Col>
                             <Flow>
                                 <div>
-                                { (balanceETB !== undefined) && <h5 className="m-2"> {balanceETB} ETB</h5> }
+                                    {(balanceETB !== undefined) && <h5 className="m-2"> {balanceETB} ETB</h5>}
                                 </div>
                                 <div>
-                                { (balanceCake !== undefined) && <h5 className="m-2"> {balanceCake} Cake-LP </h5> }
+                                    {(balanceCake !== undefined) && <h5 className="m-2"> {balanceCake} Cake-LP </h5>}
                                 </div>
                             </Flow>
                         </Col>

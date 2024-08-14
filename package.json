@@ -7,8 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "npm run artifacts && next client",
-    "artifacts": "cp -r ./build/contracts/ ./client/web3/artifacts",
+    "dev": "npm run artifacts && next dev",
+    "build": "next build",
+    "start": "next start",
+    "artifacts": "cp -r ./build/contracts/ ./src/web3/artifacts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -17,11 +19,11 @@
     "@openzeppelin/contracts": "^4.2.0",
     "bootstrap": "^5.0.0-beta3",
     "formik": "^2.2.9",
-    "next": "^11.1.0",
-    "react": "^17.0.2",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
     "react-bootstrap": "^1.6.1",
     "react-datepicker": "^4.2.1",
-    "react-dom": "^17.0.2",
+    "react-dom": "^18.3.1",
     "truffle-assertions": "^0.9.2",
     "truffle-contract": "^4.0.31",
     "web3": "^1.5.2"
