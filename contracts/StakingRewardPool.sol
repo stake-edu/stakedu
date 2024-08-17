@@ -14,8 +14,7 @@ import "../node_modules/@openzeppelin/contracts/utils/math/Math.sol";
  * The pool implements an efficient O(1) algo to distribute the rewards based on this paper:
  * https://uploads-ssl.webflow.com/5ad71ffeb79acc67c8bcdaba/5ad8d1193a40977462982470_scalable-reward-distribution-paper.pdf
  */
-contract StakingRewardPool is StakingPool  {
-
+contract StakingRewardPool is StakingPool {
     using SafeMath for uint256;
 
     event RewardPaid(address indexed user, uint256 reward);
@@ -28,7 +27,7 @@ contract StakingRewardPool is StakingPool  {
         uint lastUpdated; // when the totalStakedWeight was last updated (after last stake was ended)
         uint totalStaked; // T: sum of all active stake deposits
         uint rewardPerTokenStaked; // S: SUM(reward/T) - sum of all rewards distributed divided all active stakes
-        uint totalRewardsPaid; 
+        uint totalRewardsPaid;
     }
 
     struct UserInfo {
@@ -46,11 +45,9 @@ contract StakingRewardPool is StakingPool  {
         uint totalRewardsPaid;
     }
 
-
     IERC20 internal rewardToken;
     RewardPeriod[] public rewardPeriods;
     uint rewardPeriodsCount = 0;
-
 
     mapping(address => UserInfo) userInfos;
 
@@ -59,48 +56,47 @@ contract StakingRewardPool is StakingPool  {
 
     uint constant rewardPrecision = 1e9;
 
-
-    constructor(address _rewardTokenAddress, address _lpTokenAddress) StakingPool(_rewardTokenAddress, _lpTokenAddress) {
+    constructor(
+        address _rewardTokenAddress,
+        address _lpTokenAddress
+    ) StakingPool(_rewardTokenAddress, _lpTokenAddress) {
         rewardToken = IERC20(_rewardTokenAddress);
     }
-
 
     function newRewardPeriod(uint reward, uint from, uint to) public onlyOwner {
         require(reward > 0, "Invalid reward period amount");
         require(to > from && to > block.timestamp, "Invalid reward period interval");
-        require(rewardPeriods.length == 0 || from > rewardPeriods[rewardPeriods.length-1].to, "Invalid period start time");
+        require(
+            rewardPeriods.length == 0 || from > rewardPeriods[rewardPeriods.length - 1].to,
+            "Invalid period start time"
+        );
 
-        rewardPeriods.push(RewardPeriod(rewardPeriods.length+1, reward, from, to, block.timestamp, 0, 0, 0));
+        rewardPeriods.push(RewardPeriod(rewardPeriods.length + 1, reward, from, to, block.timestamp, 0, 0, 0));
         rewardPeriodsCount = rewardPeriods.length;
         depositReward(reward);
     }
 
-
-    function getRewardPeriodsCount() public view returns(uint) {
+    function getRewardPeriodsCount() public view returns (uint) {
         return rewardPeriodsCount;
     }
 
-
     function deleteRewardPeriod(uint index) public onlyOwner {
         require(rewardPeriods.length > index, "Invalid reward phase index");
-        for (uint i=index; i<rewardPeriods.length-1; i++) {
-            rewardPeriods[i] = rewardPeriods[i+1];
+        for (uint i = index; i < rewardPeriods.length - 1; i++) {
+            rewardPeriods[i] = rewardPeriods[i + 1];
         }
         rewardPeriods.pop();
         rewardPeriodsCount = rewardPeriods.length;
     }
 
-
     function rewardBalance() public view returns (uint) {
         return rewardToken.balanceOf(address(this));
     }
-
 
     // Deposit ETB token rewards into this contract
     function depositReward(uint amount) internal onlyOwner {
         rewardToken.transferFrom(msg.sender, address(this), amount);
     }
-
 
     function startStake(uint amount) public override {
         uint periodId = getCurrentRewardPeriodId();
@@ -110,7 +106,7 @@ contract StakingRewardPool is StakingPool  {
         super.startStake(amount);
 
         // update total tokens staked
-        RewardPeriod storage period = rewardPeriods[periodId-1];
+        RewardPeriod storage period = rewardPeriods[periodId - 1];
         period.totalStaked = period.totalStaked.add(amount);
     }
 
@@ -120,17 +116,17 @@ contract StakingRewardPool is StakingPool  {
 
         // update total tokens staked
         uint periodId = getCurrentRewardPeriodId();
-        RewardPeriod storage period = rewardPeriods[periodId-1];
+        RewardPeriod storage period = rewardPeriods[periodId - 1];
         period.totalStaked = period.totalStaked.sub(amount);
-        
+
         claim();
     }
 
-    function claimableReward() view public returns (uint) {
+    function claimableReward() public view returns (uint) {
         uint periodId = getCurrentRewardPeriodId();
         if (periodId == 0) return 0;
 
-        RewardPeriod memory period = rewardPeriods[periodId-1];
+        RewardPeriod memory period = rewardPeriods[periodId - 1];
         uint newRewardDistribution = calculateRewardDistribution(period);
         uint reward = calculateReward(newRewardDistribution);
 
@@ -139,7 +135,7 @@ contract StakingRewardPool is StakingPool  {
 
         return pending.add(reward);
     }
- 
+
     function claimReward() public {
         update();
         claim();
@@ -152,7 +148,7 @@ contract StakingRewardPool is StakingPool  {
             userInfo.pendingRewards = 0;
 
             uint periodId = getCurrentRewardPeriodId();
-            RewardPeriod storage period = rewardPeriods[periodId-1];
+            RewardPeriod storage period = rewardPeriods[periodId - 1];
             period.totalRewardsPaid = period.totalRewardsPaid.add(rewards);
 
             payReward(msg.sender, rewards);
@@ -161,15 +157,14 @@ contract StakingRewardPool is StakingPool  {
 
     function getCurrentRewardPeriodId() public view returns (uint) {
         if (rewardPeriodsCount == 0) return 0;
-        for (uint i=rewardPeriods.length; i>0; i--) {
-            RewardPeriod memory period = rewardPeriods[i-1];
+        for (uint i = rewardPeriods.length; i > 0; i--) {
+            RewardPeriod memory period = rewardPeriods[i - 1];
             if (period.from <= block.timestamp && period.to >= block.timestamp) {
                 return period.id;
             }
         }
         return 0;
     }
-
 
     function getRewardsStats() public view returns (RewardsStats memory) {
         UserInfo memory userInfo = userInfos[msg.sender];
@@ -182,14 +177,13 @@ contract StakingRewardPool is StakingPool  {
         // reward period stats
         uint periodId = getCurrentRewardPeriodId();
         if (periodId > 0) {
-            RewardPeriod memory period = rewardPeriods[periodId-1];
+            RewardPeriod memory period = rewardPeriods[periodId - 1];
             stats.rewardRate = rewardRate(period);
             stats.totalRewardsPaid = period.totalRewardsPaid;
         }
 
         return stats;
     }
-
 
     function rewardRate(RewardPeriod memory period) internal pure returns (uint) {
         uint duration = period.to.sub(period.from);
@@ -204,14 +198,13 @@ contract StakingRewardPool is StakingPool  {
         emit RewardPaid(account, reward);
     }
 
-
     /// Reward calcualtion logic
 
     function update() internal {
         uint periodId = getCurrentRewardPeriodId();
         require(periodId > 0, "No active reward period found");
 
-        RewardPeriod storage period = rewardPeriods[periodId-1];
+        RewardPeriod storage period = rewardPeriods[periodId - 1];
         uint rewardDistribuedPerToken = calculateRewardDistribution(period);
 
         // update pending rewards reward since rewardPerTokenStaked was updated
@@ -220,24 +213,25 @@ contract StakingRewardPool is StakingPool  {
         userInfo.pendingRewards = userInfo.pendingRewards.add(reward);
         userInfo.userRewardPerTokenStaked = rewardDistribuedPerToken;
 
-        require(rewardDistribuedPerToken >= period.rewardPerTokenStaked, "Reward distribution should be monotonic increasing");
+        require(
+            rewardDistribuedPerToken >= period.rewardPerTokenStaked,
+            "Reward distribution should be monotonic increasing"
+        );
 
         period.rewardPerTokenStaked = rewardDistribuedPerToken;
         period.lastUpdated = block.timestamp;
     }
 
-
-    function calculateRewardDistribution(RewardPeriod memory period) view internal returns (uint) {
-
+    function calculateRewardDistribution(RewardPeriod memory period) internal view returns (uint) {
         // calculate total reward to be distributed since period.lastUpdated
         uint rate = rewardRate(period);
         uint deltaTime = block.timestamp.sub(period.lastUpdated);
         uint reward = deltaTime.mul(rate);
 
-        uint newRewardPerTokenStaked = period.rewardPerTokenStaked;  // 0
+        uint newRewardPerTokenStaked = period.rewardPerTokenStaked; // 0
         if (period.totalStaked != 0) {
             // S = S + r / T
-            newRewardPerTokenStaked = period.rewardPerTokenStaked.add( 
+            newRewardPerTokenStaked = period.rewardPerTokenStaked.add(
                 reward.mul(rewardPrecision).div(period.totalStaked)
             );
         }
@@ -245,28 +239,24 @@ contract StakingRewardPool is StakingPool  {
         return newRewardPerTokenStaked;
     }
 
-
     function calculateReward(uint rewardDistribution) internal view returns (uint) {
         if (rewardDistribution == 0) return 0;
 
         uint staked = stakes[msg.sender];
         UserInfo memory userInfo = userInfos[msg.sender];
-        uint reward = staked.mul(
-            rewardDistribution.sub(userInfo.userRewardPerTokenStaked)
-        ).div(rewardPrecision);
+        uint reward = staked.mul(rewardDistribution.sub(userInfo.userRewardPerTokenStaked)).div(rewardPrecision);
 
         return reward;
     }
 
-
     // HELPERS - Used in tests
 
     function reset() public override onlyOwner {
-        for (uint i=0; i<rewardPeriods.length; i++) {
+        for (uint i = 0; i < rewardPeriods.length; i++) {
             delete rewardPeriods[i];
         }
         rewardPeriodsCount = 0;
-        for (uint i=0; i<usersArray.length; i++) {
+        for (uint i = 0; i < usersArray.length; i++) {
             delete userInfos[usersArray[i]];
         }
         // return leftover rewards to owner
@@ -274,5 +264,4 @@ contract StakingRewardPool is StakingPool  {
         rewardToken.transfer(msg.sender, leftover);
         super.reset();
     }
-
 }

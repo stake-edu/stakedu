@@ -1,69 +1,69 @@
-const truffleAssert = require("truffle-assertions")
+const truffleAssert = require("truffle-assertions");
 
-const CakeLP = artifacts.require("CakeLP")
-const StakingPool = artifacts.require("StakingPool")
+const CakeLP = artifacts.require("CakeLP");
+const StakingPool = artifacts.require("StakingPool");
 
+contract("Wallet", (accounts) => {
+  beforeEach(async () => {
+    let pool = await StakingPool.deployed();
+    pool.reset();
+  });
 
-contract("Wallet", accounts => {
+  it("deposit CaleLP tokens into the pool should increase the account balance", async () => {
+    let pool = await StakingPool.deployed();
+    let cakeLP = await CakeLP.deployed();
 
-    beforeEach(async () => {
-        let pool = await StakingPool.deployed()
-        pool.reset()
-    })
+    let balanceBefore = await pool.getBalance();
+    assert.equal(balanceBefore, 0, "Account should have no balance");
 
+    // deposit 100 CakeLP
+    let depositAmount = 100;
+    await cakeLP.approve(pool.address, depositAmount);
+    await pool.deposit(depositAmount);
 
-    it("deposit CaleLP tokens into the pool should increase the account balance", async () => {
-        let pool = await StakingPool.deployed()
-        let cakeLP = await CakeLP.deployed()
+    let balanceAfter = await pool.getBalance();
+    assert.equal(
+      balanceAfter,
+      depositAmount,
+      "Account should have expected token balance",
+    );
+  });
 
-        let balanceBefore = await pool.getBalance()
-        assert.equal(balanceBefore, 0, "Account should have no balance")
+  it("withdraw CaleLP tokens from the pool should reduce the account balance", async () => {
+    let pool = await StakingPool.deployed();
+    let cakeLP = await CakeLP.deployed();
 
-        // deposit 100 CakeLP 
-        let depositAmount = 100
-        await cakeLP.approve(pool.address, depositAmount)
-        await pool.deposit(depositAmount)
+    let balance = await pool.getBalance();
+    assert.equal(balance, 0, "Account should have no balance");
 
-        let balanceAfter = await pool.getBalance()
-        assert.equal(balanceAfter, depositAmount , "Account should have expected token balance")
-    })
+    // deposit 100 CakeLP
+    let depositAmount = 100;
+    await cakeLP.approve(pool.address, depositAmount);
+    await pool.deposit(depositAmount);
 
-    it("withdraw CaleLP tokens from the pool should reduce the account balance", async () => {
-        let pool = await StakingPool.deployed()
-        let cakeLP = await CakeLP.deployed()
+    // withdraw
+    await pool.withdraw(depositAmount);
 
-        let balance = await pool.getBalance()
-        assert.equal(balance, 0, "Account should have no balance")
+    let balanceAfter = await pool.getBalance();
+    assert.equal(
+      balanceAfter,
+      0,
+      "Account should have no token after withdraw",
+    );
+  });
 
-        // deposit 100 CakeLP 
-        let depositAmount = 100
-        await cakeLP.approve(pool.address, depositAmount)
-        await pool.deposit(depositAmount)
+  it("attempting to withdraw more CaleLP tokens than available in balance should throw", async () => {
+    let pool = await StakingPool.deployed();
+    let cakeLP = await CakeLP.deployed();
 
-        // withdraw
-        await pool.withdraw(depositAmount)
+    let balance = await pool.getBalance();
+    assert.equal(balance, 0, "Account should have no balance");
 
-        let balanceAfter = await pool.getBalance()
-        assert.equal(balanceAfter, 0 , "Account should have no token after withdraw")
+    // deposit 100 CakeLP
+    let depositAmount = 100;
+    await cakeLP.approve(pool.address, depositAmount);
+    await pool.deposit(depositAmount);
 
-    })
-
-    it("attempting to withdraw more CaleLP tokens than available in balance should throw", async () => {
-        let pool = await StakingPool.deployed()
-        let cakeLP = await CakeLP.deployed()
-
-        let balance = await pool.getBalance()
-        assert.equal(balance, 0, "Account should have no balance")
-
-        // deposit 100 CakeLP 
-        let depositAmount = 100
-        await cakeLP.approve(pool.address, depositAmount)
-        await pool.deposit(depositAmount)
-
-        await truffleAssert.reverts(
-              pool.withdraw(depositAmount + 1)
-        )
-
-    })
-
-})
+    await truffleAssert.reverts(pool.withdraw(depositAmount + 1));
+  });
+});

@@ -1,5 +1,5 @@
-require('dotenv').config()
-const HDWalletProvider = require('@truffle/hdwallet-provider');
+require("dotenv").config();
+const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 /**
  * Use this file to configure your truffle project. It's seeded with some
@@ -39,20 +39,23 @@ module.exports = {
    */
 
   networks: {
-
     development: {
       host: "127.0.0.1",
       port: 7545,
       network_id: "*",
       accounts: 5,
       defaultEtherBalance: 500,
-      blockTime: 3
+      blockTime: 3,
     },
     develop: {
-      port: 7545
+      port: 7545,
     },
     edu: {
-      provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, "https://rpc.open-campus-codex.gelato.digital"),
+      provider: () =>
+        new HDWalletProvider(
+          process.env.PRIVATE_KEY,
+          "https://rpc.open-campus-codex.gelato.digital",
+        ),
       network_id: 656476,
     },
 
@@ -102,7 +105,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "^0.8.0",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "^0.8.0", // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
       //  optimizer: {
@@ -111,7 +114,7 @@ module.exports = {
       //  },
       //  evmVersion: "byzantium"
       // }
-    }
+    },
   },
 
   // Truffle DB is currently disabled by default; to enable it, change enabled: false to enabled: true
@@ -121,6 +124,6 @@ module.exports = {
   // $ truffle migrate --reset --compile-all
 
   db: {
-    enabled: false
-  }
+    enabled: false,
+  },
 };

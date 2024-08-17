@@ -10,6 +10,7 @@
     "dev": "npm run artifacts && next dev",
     "build": "next build",
     "start": "next start",
+    "format": "prettier --write .",
     "artifacts": "cp -r ./build/contracts/ ./src/web3/artifacts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -33,7 +34,10 @@
     "web3": "^1.5.2"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "babel-plugin-inline-react-svg": "^1.0.1",
+    "prettier": "3.3.3",
+    "prettier-plugin-solidity": "^1.4.0",
     "typescript": "5.5.4"
   }
 }
