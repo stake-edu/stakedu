@@ -11,6 +11,12 @@ dependencies:
   '@truffle/hdwallet-provider':
     specifier: ^2.1.15
     version: 2.1.15(@babel/core@7.25.2)
+  '@types/react':
+    specifier: ^18.3.3
+    version: 18.3.3
+  '@types/react-dom':
+    specifier: ^18.3.0
+    version: 18.3.0
   bootstrap:
     specifier: ^5.0.0-beta3
     version: 5.3.3(@popperjs/core@2.11.8)
@@ -49,6 +55,9 @@ devDependencies:
   babel-plugin-inline-react-svg:
     specifier: ^1.0.1
     version: 1.1.2(@babel/core@7.25.2)
+  typescript:
+    specifier: 5.5.4
+    version: 5.5.4
 
 packages:
 
@@ -824,6 +833,12 @@ packages:
 
   /@types/prop-types@15.7.12:
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
+    dev: false
+
+  /@types/react-dom@18.3.0:
+    resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
+    dependencies:
+      '@types/react': 18.3.3
     dev: false
 
   /@types/react-transition-group@4.4.11:
@@ -4525,6 +4540,12 @@ packages:
     dependencies:
       is-typedarray: 1.0.0
     dev: false
+
+  /typescript@5.5.4:
+    resolution: {integrity: sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: true
 
   /ultron@1.1.1:
     resolution: {integrity: sha512-UIEXBNeYmKptWH6z8ZnqTeS8fV74zG0/eRU9VGkpzz+LIJNs8W/zM/L+7ctCkRrgbNnnR0xxw4bKOr0cW0N0Og==}

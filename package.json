@@ -18,6 +18,8 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.2.0",
     "@truffle/hdwallet-provider": "^2.1.15",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "bootstrap": "^5.0.0-beta3",
     "dotenv": "^16.4.5",
     "formik": "^2.2.9",
@@ -31,6 +33,7 @@
     "web3": "^1.5.2"
   },
   "devDependencies": {
-    "babel-plugin-inline-react-svg": "^1.0.1"
+    "babel-plugin-inline-react-svg": "^1.0.1",
+    "typescript": "5.5.4"
   }
 }
