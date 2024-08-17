@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  FormControl,
-  InputGroup,
-  Row,
-} from "react-bootstrap";
+import { Button, Card, Col, Container, Row } from "react-bootstrap";
 
 import { Center, Wrapped } from "../components/Layout";
 import { claimReward } from "../web3/stakes";
@@ -17,8 +8,33 @@ import RewardsInfo from "./RewardsInfo";
 import TitleValueBox from "./TitleValueBox";
 import UpdateStakeForm from "./UpdateStakeForm";
 
-export default class StakeView extends React.Component {
-  constructor(props) {
+interface RewardPeriod {
+  totalStaked: number;
+}
+
+interface StakeViewProps {
+  lpUnstaked: number;
+  lpStaked: number;
+  claimableRewards: number;
+  rewardsPaid: number;
+  rewardRate: number;
+  totalRewardsPaid: number;
+  formType?: "stake" | "unstake";
+  rewardPerdiod: RewardPeriod;
+  handleSuccess: (message: string) => void;
+  handleError: (error: Error) => void;
+  allowanceUpdated: () => void;
+}
+
+interface StakeViewState extends StakeViewProps {
+  showUpdateStakeModal: boolean;
+}
+
+export default class StakeView extends React.Component<
+  StakeViewProps,
+  StakeViewState
+> {
+  constructor(props: StakeViewProps) {
     super(props);
 
     this.state = {
@@ -27,7 +43,7 @@ export default class StakeView extends React.Component {
     };
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: StakeViewProps): void {
     if (
       prevProps.lpUnstaked !== this.props.lpUnstaked ||
       prevProps.lpStaked !== this.props.lpStaked ||
@@ -52,47 +68,47 @@ export default class StakeView extends React.Component {
     }
   }
 
-  claimRewardPressed = () => {
+  claimRewardPressed = (): void => {
     claimReward()
       .then((result) => {
         this.props.handleSuccess(
           `Reward claimed. Transaction id: ${result.tx}`,
         );
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         this.props.handleError(error);
       });
   };
 
-  showUpdateStakeModalPreseed = (buttonType) => {
+  showUpdateStakeModalPreseed = (buttonType: "stake" | "unstake"): void => {
     this.setState({
       showUpdateStakeModal: true,
       formType: buttonType,
     });
   };
 
-  hideUpdateStakeModalPreseed = () => {
+  hideUpdateStakeModalPreseed = (): void => {
     this.setState({
       showUpdateStakeModal: false,
       formType: undefined,
     });
   };
 
-  handleAllowanceUpdated = () => {
+  handleAllowanceUpdated = (): void => {
     this.props.allowanceUpdated();
   };
 
-  handleSuccess = () => {
+  handleSuccess = (): void => {
     this.hideUpdateStakeModalPreseed();
-    this.props.handleSuccess();
+    this.props.handleSuccess("Operation successful");
   };
 
-  handleError = () => {
+  handleError = (error: Error): void => {
     this.hideUpdateStakeModalPreseed();
-    this.props.handleError();
+    this.props.handleError(error);
   };
 
-  render() {
+  render(): React.ReactNode {
     const {
       showUpdateStakeModal,
       formType,
@@ -109,7 +125,7 @@ export default class StakeView extends React.Component {
         ? Math.round(
             (lpStaked * 10000) / this.state.rewardPerdiod.totalStaked,
           ) / 100
-        : "0";
+        : 0;
 
     return (
       <div>
@@ -150,7 +166,7 @@ export default class StakeView extends React.Component {
                   name="stake"
                   className="w-100"
                   variant="primary"
-                  onClick={(e) => this.showUpdateStakeModalPreseed("stake")}
+                  onClick={() => this.showUpdateStakeModalPreseed("stake")}
                 >
                   Stake
                 </Button>
@@ -160,7 +176,7 @@ export default class StakeView extends React.Component {
                   name="unstake"
                   className="w-100"
                   variant="secondary"
-                  onClick={(e) => this.showUpdateStakeModalPreseed("unstake")}
+                  onClick={() => this.showUpdateStakeModalPreseed("unstake")}
                 >
                   Unstake
                 </Button>
@@ -190,25 +206,23 @@ export default class StakeView extends React.Component {
               name="claim"
               style={{ minWidth: 200 }}
               variant="primary"
-              onClick={(e) => this.claimRewardPressed()}
+              onClick={() => this.claimRewardPressed()}
             >
               Claim rewards
             </Button>
           </div>
 
           {showUpdateStakeModal && (
-            <Modal onClose={(e) => this.hideUpdateStakeModalPreseed()}>
+            <Modal onClose={() => this.hideUpdateStakeModalPreseed()}>
               <UpdateStakeForm
                 formType={formType}
-                handleSuccess={(result) => this.handleSuccess(result)}
-                handleError={(error, message) =>
-                  this.handleError(error, message)
-                }
+                handleSuccess={() => this.handleSuccess()}
+                handleError={(error: Error) => this.handleError(error)}
                 allowanceUpdated={() => this.handleAllowanceUpdated()}
                 balance={
-                  formType == "stake"
+                  formType === "stake"
                     ? this.state.lpUnstaked
-                    : formType == "unstake"
+                    : formType === "unstake"
                       ? this.state.lpStaked
                       : 0
                 }

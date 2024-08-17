@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Button,
-  ButtonGroup,
   Col,
   Container,
   Dropdown,
@@ -9,20 +8,28 @@ import {
   Row,
 } from "react-bootstrap";
 
-import {
-  getAllowance as getAllowanceCake,
-  getBalance as getBalanceCake,
-} from "../web3/cake_lp";
-import {
-  getAllowance as getAllowanceETB,
-  getBalance as getBalanceETB,
-} from "../web3/etb";
+import { getBalance as getBalanceCake } from "../web3/cake_lp";
+import { getBalance as getBalanceETB } from "../web3/etb";
 import { myWeb3 } from "../web3/provider";
 import { getAccount, shortenAccount } from "../web3/utils";
 import { Flow } from "./Layout";
 
-export default class Header extends React.Component {
-  constructor(props) {
+interface HeaderProps {
+  reload: () => void;
+  setAccountConnected: (connected: boolean) => void;
+}
+
+interface HeaderState {
+  account?: string;
+  balanceETB?: string;
+  balanceCake?: string;
+  blockNumber?: number;
+  blockTimestamp?: number;
+  error?: string;
+}
+
+export default class Header extends React.Component<HeaderProps, HeaderState> {
+  constructor(props: HeaderProps) {
     super(props);
     this.state = {};
     this.handleAccount = this.handleAccount.bind(this);
@@ -31,7 +38,7 @@ export default class Header extends React.Component {
   componentDidMount() {
     this.reload();
 
-    ethereum.on("chainChanged", (chainId) => {
+    window.ethereum.on("chainChanged", () => {
       // Handle the new chain.
       // Correctly handling chain changes can be complicated.
       // We recommend reloading the page unless you have good reason not to.
@@ -39,26 +46,28 @@ export default class Header extends React.Component {
     });
   }
 
-  reloadPressed = async () => {
+  reloadPressed = async (): Promise<void> => {
     this.reload();
-    this.props.reload(); // reaload parent page
+    this.props.reload(); // reload parent page
   };
 
-  reload = async () => {
+  reload = async (): Promise<void> => {
     await this.loadBlockInfo();
     await this.loadAccount();
     await this.loadBalance();
   };
 
-  connect = () => {
-    ethereum.request({ method: "eth_requestAccounts" }).then((accounts) => {
-      let account = accounts.length > 0 ? accounts[0] : undefined;
-      this.reload();
-      this.handleAccount(account);
-    });
+  connect = (): void => {
+    window.ethereum
+      .request({ method: "eth_requestAccounts" })
+      .then((accounts: string[]) => {
+        let account = accounts.length > 0 ? accounts[0] : undefined;
+        this.reload();
+        this.handleAccount(account);
+      });
   };
 
-  handleAccount = (account) => {
+  handleAccount = (account?: string): void => {
     if (account) {
       this.setState({
         account: shortenAccount(account),
@@ -72,18 +81,18 @@ export default class Header extends React.Component {
     }
   };
 
-  loadAccount = () => {
+  loadAccount = (): void => {
     getAccount()
       .then((account) => {
         this.handleAccount(account);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         this.setState({ error: error.message });
         this.props.setAccountConnected(false);
       });
   };
 
-  loadBalance = () => {
+  loadBalance = (): void => {
     getBalanceETB()
       .then((data) => {
         this.setState({
@@ -96,33 +105,29 @@ export default class Header extends React.Component {
           balanceCake: data.units,
         });
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         this.setState({ error: error.message });
       });
   };
 
-  loadBlockInfo = () => {
-    myWeb3.eth.getBlock().then((block) => {
+  loadBlockInfo = (): void => {
+    myWeb3.eth.getBlock("latest").then((block) => {
       this.setState({
         blockNumber: block.number,
-        blockTimestamp: block.timestamp,
+        blockTimestamp: Number(block.timestamp),
       });
     });
   };
 
   render() {
-    const { balanceETB, balanceCake } = this.state;
+    const { balanceETB, balanceCake, blockNumber, blockTimestamp, account } =
+      this.state;
 
-    const blockNumber = this.state && this.state.blockNumber;
-    const blockDate =
-      this.state &&
-      this.state.blockTimestamp &&
-      new Date(this.state.blockTimestamp * 1000);
+    const blockDate = blockTimestamp && new Date(blockTimestamp * 1000);
     const blockDateFormatted =
       (blockDate &&
         `${blockDate.toLocaleDateString()} @ ${blockDate.toLocaleTimeString()}`) ||
       "-";
-    const account = this.state && this.state.account;
 
     return (
       <div className="header">

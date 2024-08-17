@@ -1,6 +1,12 @@
 import React from "react";
 
-export const DisplayFormikState = (props) => (
+interface DisplayFormikStateProps {
+  [key: string]: any;
+}
+
+export const DisplayFormikState: React.FC<DisplayFormikStateProps> = (
+  props,
+) => (
   <div style={{ margin: "1rem 0" }}>
     <h3 style={{ fontFamily: "monospace" }} />
     <pre

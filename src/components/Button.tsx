@@ -1,4 +1,18 @@
-const Button = ({ children, style, onClick, disabled }) => (
+import React, { CSSProperties, ReactNode } from "react";
+
+interface ButtonProps {
+  children: ReactNode;
+  style?: CSSProperties;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+const Button: React.FC<ButtonProps> = ({
+  children,
+  style,
+  onClick,
+  disabled,
+}) => (
   <button style={style} disabled={disabled} onClick={onClick}>
     {children}
 

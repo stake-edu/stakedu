@@ -6,11 +6,29 @@ import "react-datepicker/dist/react-datepicker.css";
 import { approve, getAllowance } from "../web3/etb";
 import { createRewardPeriod } from "../web3/reward_phases";
 
-export default class CreateRewardPhaseForm extends React.Component {
-  constructor(props) {
+interface CreateRewardPhaseFormProps {
+  startDate?: number;
+  allowanceUpdated: () => void;
+  handleSuccess: (message: string) => void;
+  handleError: (error: Error, message: string) => void;
+}
+
+interface CreateRewardPhaseFormState {
+  sufficientAllowance: boolean;
+  validAmount: boolean;
+  startDate: Date;
+  endDate: Date;
+  amount: string;
+  error?: string;
+}
+
+export default class CreateRewardPhaseForm extends React.Component<
+  CreateRewardPhaseFormProps,
+  CreateRewardPhaseFormState
+> {
+  constructor(props: CreateRewardPhaseFormProps) {
     super(props);
 
-    let day = 24 * 60 * 60;
     let start =
       (props.startDate && new Date((props.startDate + 1) * 1000)) || new Date();
     let end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -24,7 +42,7 @@ export default class CreateRewardPhaseForm extends React.Component {
     };
   }
 
-  updateAmount = (e) => {
+  updateAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = parseInt(e.target.value);
     let isValid = !isNaN(value) && value > 0;
 
@@ -40,10 +58,13 @@ export default class CreateRewardPhaseForm extends React.Component {
     }
   };
 
-  updateDate = (fieldName, date) => {
-    const newState = {};
-    newState[fieldName] = date;
-    this.setState(newState);
+  updateDate = (fieldName: "startDate" | "endDate", date: Date | null) => {
+    if (date) {
+      this.setState({ [fieldName]: date } as Pick<
+        CreateRewardPhaseFormState,
+        "startDate" | "endDate"
+      >);
+    }
   };
 
   allowButtonPressed = async () => {
@@ -57,11 +78,11 @@ export default class CreateRewardPhaseForm extends React.Component {
     this.props.allowanceUpdated();
   };
 
-  checkAllowance = (amount) => {
+  checkAllowance = (amount: number): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       getAllowance()
-        .then((allowance, error) => {
-          const allowanceOk = parseInt(amount) <= allowance;
+        .then((allowance) => {
+          const allowanceOk = amount <= allowance;
           resolve(allowanceOk);
         })
         .catch((error) => {
@@ -80,7 +101,7 @@ export default class CreateRewardPhaseForm extends React.Component {
       return;
     }
     if (!validAmount) {
-      this.setState({ error: "Invalid tolen amount" });
+      this.setState({ error: "Invalid token amount" });
       return;
     }
     const value = parseInt(amount);
@@ -91,14 +112,14 @@ export default class CreateRewardPhaseForm extends React.Component {
           `New reward phase created. Transaction id: ${result.tx}`,
         );
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.log("Error 2 createRewardPhase:", error);
         const message = this.getRewardPeriodError(error);
         this.props.handleError(error, message);
       });
   };
 
-  getRewardPeriodError = (error) => {
+  getRewardPeriodError = (error: Error): string => {
     switch (true) {
       case error.message.includes("Invalid period start time"):
         return "Invalid period start time";
@@ -119,49 +140,37 @@ export default class CreateRewardPhaseForm extends React.Component {
         <Form>
           <Form.Group className="mb-3" controlId="startDate">
             <Form.Label>Start Date</Form.Label>
-            {/* <Form.Control type="email" placeholder="Enter email" /> */}
-
             <DatePicker
               name="startDate"
               className="form-control datepicker"
               autoComplete="off"
-              onChange={(e) => this.updateDate("startDate", e)}
-              dateFormat="yyyy-MM-dd"
-              // value={this.state.startDate}
-              // dateFormat="dd-MM-yyyy"
-              // selected={this.state.startDate ? moment(this.state.startDate, 'DD-MM-YYYY') : moment()}
-              selected={
-                (this.state.startDate && new Date(this.state.startDate)) || null
+              onChange={(date: Date | null) =>
+                this.updateDate("startDate", date)
               }
+              dateFormat="yyyy-MM-dd"
+              selected={this.state.startDate}
             />
-
             <Form.Text className="text-muted">
-              The date the reward phase start
+              The date the reward phase starts
             </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="endDate">
             <Form.Label>End Date</Form.Label>
-            {/* <Form.Control type="email" placeholder="Enter email" /> */}
             <DatePicker
               name="endDate"
               className="form-control datepicker"
               autoComplete="off"
-              onChange={(e) => this.updateDate("endDate", e)}
+              onChange={(date: Date | null) => this.updateDate("endDate", date)}
               dateFormat="yyyy-MM-dd"
-              // value={this.state.endDate}
-              // dateFormat="dd-MM-yyyy"
-              selected={
-                (this.state.endDate && new Date(this.state.endDate)) || null
-              }
+              selected={this.state.endDate}
             />
-
             <Form.Text className="text-muted">
-              The date the reward phase end
+              The date the reward phase ends
             </Form.Text>
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="rewardAmountt">
+          <Form.Group className="mb-3" controlId="rewardAmount">
             <Form.Label>Amount</Form.Label>
             <InputGroup className="mb-3">
               <Form.Control
@@ -170,7 +179,7 @@ export default class CreateRewardPhaseForm extends React.Component {
                 placeholder="0.0"
                 autoComplete="off"
                 title="Amount"
-                onChange={(e) => this.updateAmount(e)}
+                onChange={this.updateAmount}
               />
               <InputGroup.Text> ETB </InputGroup.Text>
             </InputGroup>
@@ -182,24 +191,22 @@ export default class CreateRewardPhaseForm extends React.Component {
                 name="allow"
                 type="button"
                 variant="outline-primary"
-                onClick={(e) => this.allowButtonPressed()}
+                onClick={this.allowButtonPressed}
                 className="pl-2"
               >
                 Allow ETB token transfer
               </Button>
             )}
             &nbsp;&nbsp;&nbsp;
-            {
-              <Button
-                variant="outline-primary"
-                onClick={this.submitForm}
-                disabled={
-                  !(this.state.validAmount && this.state.sufficientAllowance)
-                }
-              >
-                Submit
-              </Button>
-            }
+            <Button
+              variant="outline-primary"
+              onClick={this.submitForm}
+              disabled={
+                !(this.state.validAmount && this.state.sufficientAllowance)
+              }
+            >
+              Submit
+            </Button>
           </div>
         </Form>
       </div>

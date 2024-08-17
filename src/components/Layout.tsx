@@ -1,8 +1,15 @@
 import Head from "next/head";
+import React, { CSSProperties, ReactNode } from "react";
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 
-export const Flow = ({ children, style, maxWidth }) => (
+interface LayoutProps {
+  children: ReactNode;
+  style?: CSSProperties;
+  maxWidth?: number;
+}
+
+export const Flow: React.FC<LayoutProps> = ({ children, style }) => (
   <div style={style}>
     {children}
     <style jsx>{`
@@ -17,7 +24,11 @@ export const Flow = ({ children, style, maxWidth }) => (
   </div>
 );
 
-export const Wrapped = ({ children, style, maxWidth }) => (
+export const Wrapped: React.FC<LayoutProps> = ({
+  children,
+  style,
+  maxWidth,
+}) => (
   <div style={style}>
     {children}
     <style jsx>{`
@@ -35,7 +46,11 @@ export const Wrapped = ({ children, style, maxWidth }) => (
   </div>
 );
 
-export const Center = ({ children, style, maxWidth }) => (
+export const Center: React.FC<LayoutProps> = ({
+  children,
+  style,
+  maxWidth,
+}) => (
   <div style={style}>
     {children}
     <style jsx>{`
@@ -48,7 +63,11 @@ export const Center = ({ children, style, maxWidth }) => (
   </div>
 );
 
-export const Page = ({ children }) => (
+interface PageProps {
+  children: ReactNode;
+}
+
+export const Page: React.FC<PageProps> = ({ children }) => (
   <div>
     <Head>
       <link

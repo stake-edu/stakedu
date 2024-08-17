@@ -1,40 +1,48 @@
 import React from "react";
-import {
-  Button,
-  ButtonGroup,
-  ButtonToolbar,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-} from "react-bootstrap";
+import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 
-import { Center } from "../components/Layout";
 import { approve, getAllowance } from "../web3/cake_lp";
 import { endStake, startStake } from "../web3/stakes";
 
-export default class UpdateStakeForm extends React.Component {
-  constructor(props) {
+interface UpdateStakeFormProps {
+  formType: "stake" | "unstake";
+  balance: string;
+  handleSuccess: (message: string) => void;
+  handleError: (error: Error, message: string) => void;
+}
+
+interface UpdateStakeFormState {
+  amount: string;
+  validAmount: boolean;
+  sufficientAllowance: boolean;
+  error?: string;
+}
+
+export default class UpdateStakeForm extends React.Component<
+  UpdateStakeFormProps,
+  UpdateStakeFormState
+> {
+  constructor(props: UpdateStakeFormProps) {
     super(props);
     this.state = {
-      ...props,
       amount: "",
+      validAmount: false,
+      sufficientAllowance: false,
     };
   }
 
-  setAmount = (perc) => {
-    const amount = Math.floor(Number(this.state.balance) * perc) / 100;
-    let isValid = !isNaN(amount) && amount > 0;
+  setAmount = (perc: number): void => {
+    const amount = Math.floor(Number(this.props.balance) * perc) / 100;
+    const isValid = !isNaN(amount) && amount > 0;
     this.setState({
       validAmount: isValid,
       amount: isNaN(amount) ? "" : amount.toString(),
     });
   };
 
-  updateAmount = (e) => {
-    let value = this.parseAmount(e.target.value);
-    let isValid = !isNaN(value) && value >= 0;
+  updateAmount = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const value = this.parseAmount(e.target.value);
+    const isValid = !isNaN(value) && value >= 0;
 
     this.setState({
       validAmount: isValid,
@@ -48,16 +56,16 @@ export default class UpdateStakeForm extends React.Component {
     }
   };
 
-  allowButtonPressed = async () => {
+  allowButtonPressed = async (): Promise<void> => {
     const amount = Number(this.state.amount);
-    await approve(amount).then((result) => {
+    await approve(amount).then(() => {
       this.checkAllowance(amount).then((allowanceOk) => {
         this.setState({ sufficientAllowance: allowanceOk });
       });
     });
   };
 
-  checkAllowance = (amount) => {
+  checkAllowance = (amount: number): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       getAllowance()
         .then((allowance) => {
@@ -71,15 +79,15 @@ export default class UpdateStakeForm extends React.Component {
     });
   };
 
-  submitForm = () => {
-    if (this.state.formType === "stake") {
+  submitForm = (): void => {
+    if (this.props.formType === "stake") {
       this.submitStake();
-    } else if (this.state.formType === "unstake") {
+    } else if (this.props.formType === "unstake") {
       this.submitUnstake();
     }
   };
 
-  submitStake = () => {
+  submitStake = (): void => {
     const { amount, sufficientAllowance, validAmount } = this.state;
 
     if (!sufficientAllowance) {
@@ -87,7 +95,7 @@ export default class UpdateStakeForm extends React.Component {
       return;
     }
     if (!validAmount) {
-      this.setState({ error: "Invalid tolen amount" });
+      this.setState({ error: "Invalid token amount" });
       return;
     }
     const value = Number(amount);
@@ -98,17 +106,17 @@ export default class UpdateStakeForm extends React.Component {
           `Stake increased. Transaction id: ${result.tx}`,
         );
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.log(">>> onSubmit startStake error:", error);
         const message = this.getStakeError(error);
         this.props.handleError(error, message);
       });
   };
 
-  submitUnstake = () => {
+  submitUnstake = (): void => {
     const { amount, validAmount } = this.state;
     if (!validAmount) {
-      this.setState({ error: "Invalid tolen amount" });
+      this.setState({ error: "Invalid token amount" });
       return;
     }
     const value = Number(amount);
@@ -119,14 +127,14 @@ export default class UpdateStakeForm extends React.Component {
           `Stake decreased. Transaction id: ${result.tx}`,
         );
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.log(">>> submitUnstake endStake error:", error);
         const message = this.getStakeError(error);
         this.props.handleError(error, message);
       });
   };
 
-  getStakeError = (error) => {
+  getStakeError = (error: Error): string => {
     switch (true) {
       case error.message.includes("No active reward phase found"):
         return "No active reward phase found";
@@ -139,27 +147,21 @@ export default class UpdateStakeForm extends React.Component {
     }
   };
 
-  parseAmount = (amount) => {
+  parseAmount = (amount: string): number => {
     return Math.floor(Number(amount) * 100) / 100;
   };
 
   render() {
-    const { formType, balance } = this.state;
+    const { formType, balance } = this.props;
 
-    const title =
-      formType === "stake"
-        ? "Stake"
-        : formType === "unstake"
-          ? "Unstake"
-          : undefined;
-    if (!title) return <div>Error</div>;
+    const title = formType === "stake" ? "Stake" : "Unstake";
 
     return (
       <div>
         <h3 className="text-center">{title}</h3>
 
         <Form className="p-4">
-          <Form.Group row controlId="stakeAmount">
+          <Form.Group controlId="stakeAmount">
             <Form.Label
               variant="secondary"
               className="w-100 text-end text-muted"
@@ -173,7 +175,7 @@ export default class UpdateStakeForm extends React.Component {
                 autoComplete="off"
                 value={this.state.amount}
                 title="balance not staked"
-                onChange={(e) => this.updateAmount(e)}
+                onChange={this.updateAmount}
               />
               <InputGroup.Text> Cake-LP </InputGroup.Text>
             </InputGroup>
@@ -182,44 +184,40 @@ export default class UpdateStakeForm extends React.Component {
           <Container>
             <Row>
               <Col className="m-0 p-2">
-                {" "}
                 <Button
                   onClick={() => this.setAmount(25)}
                   className="w-100"
                   variant="outline-secondary"
                 >
                   25%
-                </Button>{" "}
+                </Button>
               </Col>
               <Col className="m-0 p-2">
-                {" "}
                 <Button
                   onClick={() => this.setAmount(50)}
                   className="w-100"
                   variant="outline-secondary"
                 >
                   50%
-                </Button>{" "}
+                </Button>
               </Col>
               <Col className="m-0 p-2">
-                {" "}
                 <Button
                   onClick={() => this.setAmount(75)}
                   className="w-100"
                   variant="outline-secondary"
                 >
                   75%
-                </Button>{" "}
+                </Button>
               </Col>
               <Col className="m-0 p-2">
-                {" "}
                 <Button
                   onClick={() => this.setAmount(100)}
                   className="w-100"
                   variant="outline-secondary"
                 >
                   Max
-                </Button>{" "}
+                </Button>
               </Col>
             </Row>
           </Container>
@@ -227,33 +225,30 @@ export default class UpdateStakeForm extends React.Component {
           <div style={{ textAlign: "center" }} className="mt-4">
             {this.state.validAmount &&
               !this.state.sufficientAllowance &&
-              this.state.formType === "stake" && (
+              formType === "stake" && (
                 <Button
                   name="allow"
                   type="button"
                   variant="primary w-50"
-                  onClick={(e) => this.allowButtonPressed()}
+                  onClick={this.allowButtonPressed}
                   className="pl-2"
                 >
                   Allow LP token transfer
                 </Button>
               )}
             &nbsp;&nbsp;&nbsp;
-            {
-              <Button
-                variant="primary w-25"
-                onClick={this.submitForm}
-                disabled={
-                  !(
-                    this.state.validAmount &&
-                    (this.state.formType === "unstake" ||
-                      this.state.sufficientAllowance)
-                  )
-                }
-              >
-                {title}
-              </Button>
-            }
+            <Button
+              variant="primary w-25"
+              onClick={this.submitForm}
+              disabled={
+                !(
+                  this.state.validAmount &&
+                  (formType === "unstake" || this.state.sufficientAllowance)
+                )
+              }
+            >
+              {title}
+            </Button>
           </div>
         </Form>
       </div>

@@ -1,4 +1,11 @@
-export default ({ onClose, children }) => (
+import React from "react";
+
+interface ModalProps {
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+const Modal: React.FC<ModalProps> = ({ onClose, children }) => (
   <div>
     <div className="overlay" onClick={onClose} />
     <div className="form-modal">{children}</div>
@@ -32,3 +39,5 @@ export default ({ onClose, children }) => (
     `}</style>
   </div>
 );
+
+export default Modal;

@@ -1,6 +1,17 @@
+import React from "react";
 import { Col, Container, Form, Row } from "react-bootstrap";
 
-export default ({ title, value, symbol }) => (
+interface TitleValueBoxProps {
+  title: string;
+  value: string | number;
+  symbol: string;
+}
+
+const TitleValueBox: React.FC<TitleValueBoxProps> = ({
+  title,
+  value,
+  symbol,
+}) => (
   <div>
     <Container className="border border-primary">
       <Form.Group as={Row} controlId="lpTokenBalance">
@@ -15,3 +26,5 @@ export default ({ title, value, symbol }) => (
     </Container>
   </div>
 );
+
+export default TitleValueBox;
