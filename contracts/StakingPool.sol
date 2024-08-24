@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-pragma abicoder v2;
+pragma solidity ^0.8.20;
 
-import "./Wallet.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-contract StakingPool is Wallet {
-    using SafeMath for uint256;
+import "./Wallet.sol";
 
+contract StakingPool is Wallet {
     event Staked(address indexed user, uint amount);
     event UnStaked(address indexed user, uint256 amount);
 
@@ -15,7 +13,7 @@ contract StakingPool is Wallet {
     mapping(address => uint) public stakes;
     uint public totalStakes;
 
-    constructor(address _rewardTokenAddress, address _lpTokenAddress) Wallet(_lpTokenAddress) {}
+    constructor(address, address _lpTokenAddress) Wallet(_lpTokenAddress) {}
 
     function depositAndStartStake(uint256 amount) public {
         deposit(amount);
@@ -32,10 +30,10 @@ contract StakingPool is Wallet {
         require(balances[msg.sender] >= amount, "Not enough tokens to stake");
 
         // move tokens from lp token balance to the staked balance
-        balances[msg.sender] = balances[msg.sender].sub(amount);
-        stakes[msg.sender] = stakes[msg.sender].add(amount);
+        balances[msg.sender] -= amount;
+        stakes[msg.sender] += amount;
 
-        totalStakes = totalStakes.add(amount);
+        totalStakes += amount;
 
         emit Staked(msg.sender, amount);
     }
@@ -44,24 +42,15 @@ contract StakingPool is Wallet {
         require(stakes[msg.sender] >= amount, "Not enough tokens staked");
 
         // return lp tokens to lp token balance
-        balances[msg.sender] = balances[msg.sender].add(amount);
-        stakes[msg.sender] = stakes[msg.sender].sub(amount);
+        balances[msg.sender] += amount;
+        stakes[msg.sender] -= amount;
 
-        totalStakes = totalStakes.sub(amount);
+        totalStakes -= amount;
 
         emit UnStaked(msg.sender, amount);
     }
 
     function getStakedBalance() public view returns (uint) {
         return stakes[msg.sender];
-    }
-
-    function reset() public virtual onlyOwner {
-        // reset user balances and stakes
-        for (uint i = 0; i < usersArray.length; i++) {
-            balances[usersArray[i]] = 0;
-            stakes[usersArray[i]] = 0;
-        }
-        totalStakes = 0;
     }
 }

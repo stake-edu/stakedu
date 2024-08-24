@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-pragma abicoder v2;
+pragma solidity ^0.8.20;
 
 import "./StakingPool.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
  * Pool contract to distribute reward tokens among LP token stakers proportionally to the amount and duration of the their stakes.
@@ -15,8 +13,6 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
  * https://uploads-ssl.webflow.com/5ad71ffeb79acc67c8bcdaba/5ad8d1193a40977462982470_scalable-reward-distribution-paper.pdf
  */
 contract StakingRewardPool is StakingPool {
-    using SafeMath for uint256;
-
     event RewardPaid(address indexed user, uint256 reward);
 
     struct RewardPeriod {
@@ -71,7 +67,18 @@ contract StakingRewardPool is StakingPool {
             "Invalid period start time"
         );
 
-        rewardPeriods.push(RewardPeriod(rewardPeriods.length + 1, reward, from, to, block.timestamp, 0, 0, 0));
+        rewardPeriods.push(
+            RewardPeriod({
+                id: rewardPeriods.length + 1,
+                reward: reward,
+                from: from,
+                to: to,
+                lastUpdated: block.timestamp,
+                totalStaked: 0,
+                rewardPerTokenStaked: 0,
+                totalRewardsPaid: 0
+            })
+        );
         rewardPeriodsCount = rewardPeriods.length;
         depositReward(reward);
     }
@@ -93,7 +100,7 @@ contract StakingRewardPool is StakingPool {
         return rewardToken.balanceOf(address(this));
     }
 
-    // Deposit ETB token rewards into this contract
+    // Deposit reward token into this contract
     function depositReward(uint amount) internal onlyOwner {
         rewardToken.transferFrom(msg.sender, address(this), amount);
     }
@@ -107,7 +114,7 @@ contract StakingRewardPool is StakingPool {
 
         // update total tokens staked
         RewardPeriod storage period = rewardPeriods[periodId - 1];
-        period.totalStaked = period.totalStaked.add(amount);
+        period.totalStaked += amount;
     }
 
     function endStake(uint amount) public override {
@@ -117,7 +124,7 @@ contract StakingRewardPool is StakingPool {
         // update total tokens staked
         uint periodId = getCurrentRewardPeriodId();
         RewardPeriod storage period = rewardPeriods[periodId - 1];
-        period.totalStaked = period.totalStaked.sub(amount);
+        period.totalStaked -= amount;
 
         claim();
     }
@@ -133,7 +140,7 @@ contract StakingRewardPool is StakingPool {
         UserInfo memory userInfo = userInfos[msg.sender];
         uint pending = userInfo.pendingRewards;
 
-        return pending.add(reward);
+        return pending + reward;
     }
 
     function claimReward() public {
@@ -149,7 +156,7 @@ contract StakingRewardPool is StakingPool {
 
             uint periodId = getCurrentRewardPeriodId();
             RewardPeriod storage period = rewardPeriods[periodId - 1];
-            period.totalRewardsPaid = period.totalRewardsPaid.add(rewards);
+            period.totalRewardsPaid += rewards;
 
             payReward(msg.sender, rewards);
         }
@@ -169,7 +176,13 @@ contract StakingRewardPool is StakingPool {
     function getRewardsStats() public view returns (RewardsStats memory) {
         UserInfo memory userInfo = userInfos[msg.sender];
 
-        RewardsStats memory stats = RewardsStats(0, 0, 0, 0);
+        RewardsStats memory stats = RewardsStats({
+            claimableRewards: 0,
+            rewardsPaid: 0,
+            rewardRate: 0,
+            totalRewardsPaid: 0
+        });
+
         // user stats
         stats.claimableRewards = claimableReward();
         stats.rewardsPaid = userInfo.rewardsPaid;
@@ -186,13 +199,13 @@ contract StakingRewardPool is StakingPool {
     }
 
     function rewardRate(RewardPeriod memory period) internal pure returns (uint) {
-        uint duration = period.to.sub(period.from);
-        return period.reward.div(duration);
+        uint duration = period.to - period.from;
+        return period.reward / duration;
     }
 
     function payReward(address account, uint reward) internal {
         UserInfo storage userInfo = userInfos[msg.sender];
-        userInfo.rewardsPaid = userInfo.rewardsPaid.add(reward);
+        userInfo.rewardsPaid += reward;
         rewardToken.transfer(account, reward);
 
         emit RewardPaid(account, reward);
@@ -210,7 +223,7 @@ contract StakingRewardPool is StakingPool {
         // update pending rewards reward since rewardPerTokenStaked was updated
         uint reward = calculateReward(rewardDistribuedPerToken);
         UserInfo storage userInfo = userInfos[msg.sender];
-        userInfo.pendingRewards = userInfo.pendingRewards.add(reward);
+        userInfo.pendingRewards += reward;
         userInfo.userRewardPerTokenStaked = rewardDistribuedPerToken;
 
         require(
@@ -225,15 +238,13 @@ contract StakingRewardPool is StakingPool {
     function calculateRewardDistribution(RewardPeriod memory period) internal view returns (uint) {
         // calculate total reward to be distributed since period.lastUpdated
         uint rate = rewardRate(period);
-        uint deltaTime = block.timestamp.sub(period.lastUpdated);
-        uint reward = deltaTime.mul(rate);
+        uint deltaTime = block.timestamp - period.lastUpdated;
+        uint reward = deltaTime * rate;
 
         uint newRewardPerTokenStaked = period.rewardPerTokenStaked; // 0
         if (period.totalStaked != 0) {
             // S = S + r / T
-            newRewardPerTokenStaked = period.rewardPerTokenStaked.add(
-                reward.mul(rewardPrecision).div(period.totalStaked)
-            );
+            newRewardPerTokenStaked += (reward * rewardPrecision) / period.totalStaked;
         }
 
         return newRewardPerTokenStaked;
@@ -244,24 +255,8 @@ contract StakingRewardPool is StakingPool {
 
         uint staked = stakes[msg.sender];
         UserInfo memory userInfo = userInfos[msg.sender];
-        uint reward = staked.mul(rewardDistribution.sub(userInfo.userRewardPerTokenStaked)).div(rewardPrecision);
+        uint reward = (staked * (rewardDistribution - userInfo.userRewardPerTokenStaked)) / rewardPrecision;
 
         return reward;
-    }
-
-    // HELPERS - Used in tests
-
-    function reset() public override onlyOwner {
-        for (uint i = 0; i < rewardPeriods.length; i++) {
-            delete rewardPeriods[i];
-        }
-        rewardPeriodsCount = 0;
-        for (uint i = 0; i < usersArray.length; i++) {
-            delete userInfos[usersArray[i]];
-        }
-        // return leftover rewards to owner
-        uint leftover = rewardBalance();
-        rewardToken.transfer(msg.sender, leftover);
-        super.reset();
     }
 }

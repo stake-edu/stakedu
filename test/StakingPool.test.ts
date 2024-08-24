@@ -3,32 +3,32 @@ import {
   time,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { assert, expect } from "chai";
+import { ZeroAddress } from "ethers";
 import hre from "hardhat";
 
 describe("StakingPool", () => {
   async function fixture() {
-    const ETB = await hre.ethers.deployContract("ETB");
-    const cakeLP = await hre.ethers.deployContract("CakeLP");
+    const stakingToken = await hre.ethers.deployContract("CakeLP");
 
     const POOL = await hre.ethers.getContractFactory("StakingPool");
-    const pool = await POOL.deploy(ETB.target, cakeLP.target);
+    const pool = await POOL.deploy(ZeroAddress, stakingToken.target);
     await pool.waitForDeployment();
 
-    return { pool, cakeLP };
+    return { pool, stakingToken };
   }
 
-  it("staking CaleLP tokens should decrease the account balance", async () => {
-    const { pool, cakeLP } = await loadFixture(fixture);
+  it("Staking tokens should decrease the account balance", async () => {
+    const { pool, stakingToken } = await loadFixture(fixture);
 
-    // deposit 100 CakeLP
+    // deposit 100
     let depositAmount = 100n;
-    await cakeLP.approve(pool.target, depositAmount);
+    await stakingToken.approve(pool.target, depositAmount);
     await pool.deposit(depositAmount);
 
     let balance = await pool.getBalance();
     assert.equal(balance, depositAmount, "Invalid initial token balance");
 
-    // stake 60 CakeLP
+    // stake 60
     let stakedAmount = 60n;
     await pool.startStake(stakedAmount);
 
@@ -41,11 +41,11 @@ describe("StakingPool", () => {
     );
   });
 
-  it("staking CaleLP tokens should increase the staked token balance", async () => {
-    const { pool, cakeLP } = await loadFixture(fixture);
+  it("Staking tokens should increase the staked token balance", async () => {
+    const { pool, stakingToken } = await loadFixture(fixture);
 
-    // deposit 100 CakeLP
-    await cakeLP.approve(pool.target, 100n);
+    // deposit 100
+    await stakingToken.approve(pool.target, 100n);
     await pool.deposit(100n);
 
     // initial stake
@@ -56,7 +56,7 @@ describe("StakingPool", () => {
       "Account should have no staked tokens balance",
     );
 
-    // stake 60 CakeLP
+    // stake 60
     let stakedAmount = 60n;
     await pool.startStake(stakedAmount);
 
@@ -69,13 +69,13 @@ describe("StakingPool", () => {
   });
 
   it("staking additional tokens should increase the staked token balance", async () => {
-    const { pool, cakeLP } = await loadFixture(fixture);
+    const { pool, stakingToken } = await loadFixture(fixture);
 
-    // deposit 100 CakeLP
-    await cakeLP.approve(pool.target, 100n);
+    // deposit 100
+    await stakingToken.approve(pool.target, 100n);
     await pool.deposit(100n);
 
-    // stake 30 CakeLP
+    // stake 30
     let firstStakeAmount = 30n;
     await pool.startStake(firstStakeAmount);
 
@@ -89,7 +89,7 @@ describe("StakingPool", () => {
     let deltaTime = 10;
     await time.increase(deltaTime);
 
-    // stake 40 CakeLP
+    // stake 40
     let secondStakeAmount = 40n;
     await pool.startStake(secondStakeAmount);
 
@@ -101,14 +101,14 @@ describe("StakingPool", () => {
     );
   });
 
-  it("unstaking CaleLP tokens should increase the CaleLP balance", async () => {
-    const { pool, cakeLP } = await loadFixture(fixture);
+  it("Unstaking tokens should increase the balance", async () => {
+    const { pool, stakingToken } = await loadFixture(fixture);
 
-    // deposit 100 CakeLP
-    await cakeLP.approve(pool.target, 100n);
+    // deposit 100
+    await stakingToken.approve(pool.target, 100n);
     await pool.deposit(100n);
 
-    // stake 30 CakeLP
+    // stake 30
     let stakedAmount = 30n;
     await pool.startStake(stakedAmount);
 
@@ -124,15 +124,15 @@ describe("StakingPool", () => {
     );
   });
 
-  it("unstaking CaleLP tokens should decrease the staked balance", async () => {
-    const { pool, cakeLP } = await loadFixture(fixture);
+  it("Unstaking tokens should decrease the staked balance", async () => {
+    const { pool, stakingToken } = await loadFixture(fixture);
 
-    // deposit 100 CakeLP
+    // deposit 100
     let depositAmount = 100n;
-    await cakeLP.approve(pool.target, depositAmount);
+    await stakingToken.approve(pool.target, depositAmount);
     await pool.deposit(depositAmount);
 
-    // stake 30 CakeLP
+    // stake 30
     let stakedAmount = 30n;
     await pool.startStake(stakedAmount);
 
@@ -149,14 +149,14 @@ describe("StakingPool", () => {
   });
 
   it("attempting to end stake with no active stake should throw", async () => {
-    const { pool, cakeLP } = await loadFixture(fixture);
+    const { pool, stakingToken } = await loadFixture(fixture);
 
     let balance = await pool.getBalance();
     assert.equal(balance, 0n, "Account should have no balance");
 
-    // deposit 100 CakeLP
+    // deposit 100
     let depositAmount = 100n;
-    await cakeLP.approve(pool.target, depositAmount);
+    await stakingToken.approve(pool.target, depositAmount);
     await pool.deposit(depositAmount);
 
     await expect(pool.endStake(100n)).to.be.reverted;

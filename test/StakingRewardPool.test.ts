@@ -9,21 +9,26 @@ describe("StakingRewardPool", () => {
   async function fixture() {
     const accounts = await ethers.getSigners();
 
-    const ETB = await hre.ethers.deployContract("ETB");
-    const cakeLP = await hre.ethers.deployContract("CakeLP");
+    const rewardToken = await hre.ethers.deployContract("ETB");
+    const stakingToken = await hre.ethers.deployContract("CakeLP");
 
     const POOL = await hre.ethers.getContractFactory("StakingRewardPool");
-    const pool = await POOL.deploy(ETB.target, cakeLP.target);
+    const pool = await POOL.deploy(rewardToken.target, stakingToken.target);
     await pool.waitForDeployment();
 
-    await cakeLP.connect(accounts[0]).transfer(accounts[1].address, 10000n);
-    await cakeLP.connect(accounts[0]).transfer(accounts[2].address, 10000n);
+    await stakingToken
+      .connect(accounts[0])
+      .transfer(accounts[1].address, 10000n);
 
-    return { pool, cakeLP, etb: ETB, accounts };
+    await stakingToken
+      .connect(accounts[0])
+      .transfer(accounts[2].address, 10000n);
+
+    return { pool, stakingToken, rewardToken, accounts };
   }
 
   it("starting a new reward phase should setup the reward phase and reward token balance in the pool", async () => {
-    const { pool, etb } = await loadFixture(fixture);
+    const { pool, rewardToken } = await loadFixture(fixture);
 
     let balance = await pool.rewardBalance();
     assert.equal(balance, 0n, "Invalid reward token balance");
@@ -36,7 +41,7 @@ describe("StakingRewardPool", () => {
     let end = start + BigInt(7 * 24 * 60 * 60);
 
     // approve reward transfer
-    await etb.approve(pool.target, reward);
+    await rewardToken.approve(pool.target, reward);
 
     // start a new reward phase
     await pool.newRewardPeriod(reward, start, end);
@@ -58,11 +63,12 @@ describe("StakingRewardPool", () => {
   });
 
   it("claimableReward should return the reward yet to be claimed ", async () => {
-    const { pool, etb, cakeLP, accounts } = await loadFixture(fixture);
+    const { pool, rewardToken, stakingToken, accounts } =
+      await loadFixture(fixture);
 
     // deposit LP tokens to stake
     let stakeAmount = 10;
-    await cakeLP.connect(accounts[1]).approve(pool.target, stakeAmount);
+    await stakingToken.connect(accounts[1]).approve(pool.target, stakeAmount);
     await pool.connect(accounts[1]).deposit(stakeAmount);
 
     // start a new reward phase
@@ -70,7 +76,7 @@ describe("StakingRewardPool", () => {
     let rewardRate = 2n;
     let periodReward = rewardRate * period;
 
-    await etb.approve(pool.target, periodReward);
+    await rewardToken.approve(pool.target, periodReward);
 
     // let latestBlock = await web3.eth.getBlock("latest");
     let start = BigInt(await time.latest());
@@ -104,11 +110,12 @@ describe("StakingRewardPool", () => {
   });
 
   it("The reward for 1 stake across the full reward phase should equal the full reward", async () => {
-    const { pool, etb, cakeLP, accounts } = await loadFixture(fixture);
+    const { pool, rewardToken, stakingToken, accounts } =
+      await loadFixture(fixture);
 
     // deposit LP tokens to stake
     let stakeAmount = 10n;
-    await cakeLP.connect(accounts[1]).approve(pool.target, stakeAmount);
+    await stakingToken.connect(accounts[1]).approve(pool.target, stakeAmount);
     await pool.connect(accounts[1]).deposit(stakeAmount);
 
     // start a new reward phase of 1 week.
@@ -117,7 +124,7 @@ describe("StakingRewardPool", () => {
     let week = 7 * day;
     let reward = 5 * week;
 
-    await etb.approve(pool.target, reward);
+    await rewardToken.approve(pool.target, reward);
 
     // Start slightly in the future so user can deposit at the start
     let start = (await time.latest()) + 2;
@@ -134,18 +141,19 @@ describe("StakingRewardPool", () => {
     await pool.connect(accounts[1]).endStake(stakeAmount);
 
     assert.equal(
-      await etb.balanceOf(accounts[1].address),
+      await rewardToken.balanceOf(accounts[1].address),
       BigInt(reward),
       "Reward earned should equal the contract reward for this phase",
     );
   });
 
   it("The reward for a single stake should be the total reward distributed during the stake interval", async () => {
-    const { pool, etb, cakeLP, accounts } = await loadFixture(fixture);
+    const { pool, rewardToken, stakingToken, accounts } =
+      await loadFixture(fixture);
 
     // deposit LP tokens to stake
     let stakeAmount = 10;
-    await cakeLP.connect(accounts[1]).approve(pool.target, stakeAmount);
+    await stakingToken.connect(accounts[1]).approve(pool.target, stakeAmount);
     await pool.connect(accounts[1]).deposit(stakeAmount);
 
     // start a new reward phase of 1000 seconds
@@ -154,14 +162,14 @@ describe("StakingRewardPool", () => {
     let rewardRate = 2n;
     let reward = rewardRate * period;
 
-    await etb.approve(pool.target, reward);
+    await rewardToken.approve(pool.target, reward);
 
     let start = await time.latest();
     let end = start + Number(period);
 
     await pool.newRewardPeriod(reward, start, end);
 
-    let rewardBalanceBefore = await etb.balanceOf(accounts[1].address);
+    let rewardBalanceBefore = await rewardToken.balanceOf(accounts[1].address);
 
     // wait
     await time.increase(500);
@@ -178,7 +186,7 @@ describe("StakingRewardPool", () => {
     let t1 = await time.latest();
 
     // verify reward earned
-    let rewardBalanceAfter = await etb.balanceOf(accounts[1].address);
+    let rewardBalanceAfter = await rewardToken.balanceOf(accounts[1].address);
     let rewardEarned = rewardBalanceAfter - rewardBalanceBefore;
     let stakeInterval = t1 - t0;
     let expectedReward = rewardRate * BigInt(stakeInterval);
@@ -187,15 +195,16 @@ describe("StakingRewardPool", () => {
   });
 
   it("The reward of 2 overlapping stakes should be proportional to the amount of tokens staked", async () => {
-    const { pool, etb, cakeLP, accounts } = await loadFixture(fixture);
+    const { pool, rewardToken, stakingToken, accounts } =
+      await loadFixture(fixture);
 
     // deposit LP tokens
     let stake1Amount = 10n;
-    await cakeLP.connect(accounts[1]).approve(pool.target, stake1Amount);
+    await stakingToken.connect(accounts[1]).approve(pool.target, stake1Amount);
     await pool.connect(accounts[1]).deposit(stake1Amount);
 
     let stake2Amount = 20;
-    await cakeLP.connect(accounts[2]).approve(pool.target, stake2Amount);
+    await stakingToken.connect(accounts[2]).approve(pool.target, stake2Amount);
     await pool.connect(accounts[2]).deposit(stake2Amount);
 
     // start a new reward phase of 1000s .
@@ -206,7 +215,7 @@ describe("StakingRewardPool", () => {
     let start = await time.latest();
     let end = start + period;
 
-    await etb.approve(pool.target, reward);
+    await rewardToken.approve(pool.target, reward);
     await pool.newRewardPeriod(reward, start, end);
 
     // wait some time
@@ -219,15 +228,15 @@ describe("StakingRewardPool", () => {
     // wait some time
     await time.increase(100);
 
-    let rewardBalance1Before = await etb.balanceOf(accounts[1].address);
-    let rewardBalance2Before = await etb.balanceOf(accounts[2].address);
+    let rewardBalance1Before = await rewardToken.balanceOf(accounts[1].address);
+    let rewardBalance2Before = await rewardToken.balanceOf(accounts[2].address);
 
     // end stakes
     await pool.connect(accounts[1]).endStake(1);
     await pool.connect(accounts[2]).endStake(1);
 
-    let rewardBalance1After = await etb.balanceOf(accounts[1].address);
-    let rewardBalance2After = await etb.balanceOf(accounts[2].address);
+    let rewardBalance1After = await rewardToken.balanceOf(accounts[1].address);
+    let rewardBalance2After = await rewardToken.balanceOf(accounts[2].address);
 
     let rewardEarned1 = rewardBalance1After - rewardBalance1Before;
     let rewardEarned2 = rewardBalance2After - rewardBalance2Before;
@@ -240,15 +249,16 @@ describe("StakingRewardPool", () => {
   });
 
   it("The reward of 2 non overlapping stakes of the same duration and different amounts should be the same", async () => {
-    const { pool, etb, cakeLP, accounts } = await loadFixture(fixture);
+    const { pool, rewardToken, stakingToken, accounts } =
+      await loadFixture(fixture);
 
     // deposit LP tokens
     let stake1Amount = 10n;
-    await cakeLP.connect(accounts[1]).approve(pool.target, stake1Amount);
+    await stakingToken.connect(accounts[1]).approve(pool.target, stake1Amount);
     await pool.connect(accounts[1]).deposit(stake1Amount);
 
     let stake2Amount = 20n;
-    await cakeLP.connect(accounts[2]).approve(pool.target, stake2Amount);
+    await stakingToken.connect(accounts[2]).approve(pool.target, stake2Amount);
     await pool.connect(accounts[2]).deposit(stake2Amount);
 
     // start a new reward phase of 1000 seconds
@@ -256,7 +266,7 @@ describe("StakingRewardPool", () => {
     let period = 1000n;
     let reward = 1n * period;
 
-    await etb.approve(pool.target, reward);
+    await rewardToken.approve(pool.target, reward);
 
     let start = BigInt(await time.latest());
     let end = start + period;
@@ -264,8 +274,8 @@ describe("StakingRewardPool", () => {
     await pool.newRewardPeriod(reward, start, end);
 
     // get reward token balance before staking starts
-    let rewardBalance1Before = await etb.balanceOf(accounts[1].address);
-    let rewardBalance2Before = await etb.balanceOf(accounts[2].address);
+    let rewardBalance1Before = await rewardToken.balanceOf(accounts[1].address);
+    let rewardBalance2Before = await rewardToken.balanceOf(accounts[2].address);
 
     // start account 1 stake
     await pool.connect(accounts[1]).startStake(stake1Amount);
@@ -285,8 +295,8 @@ describe("StakingRewardPool", () => {
     // end second stake
     await pool.connect(accounts[2]).endStake(stake2Amount);
 
-    let rewardBalance1After = await etb.balanceOf(accounts[1].address);
-    let rewardBalance2After = await etb.balanceOf(accounts[2].address);
+    let rewardBalance1After = await rewardToken.balanceOf(accounts[1].address);
+    let rewardBalance2After = await rewardToken.balanceOf(accounts[2].address);
 
     let rewardEarned1 = rewardBalance1After - rewardBalance1Before;
     let rewardEarned2 = rewardBalance2After - rewardBalance2Before;
@@ -298,15 +308,16 @@ describe("StakingRewardPool", () => {
   });
 
   it("The rewards for 2 non overlapping stakes of the same amount, should be proportional to the time the tokens were staked", async () => {
-    const { pool, etb, cakeLP, accounts } = await loadFixture(fixture);
+    const { pool, rewardToken, stakingToken, accounts } =
+      await loadFixture(fixture);
 
     // deposit lp tokens
     let stake1Amount = 10n;
-    await cakeLP.connect(accounts[1]).approve(pool.target, stake1Amount);
+    await stakingToken.connect(accounts[1]).approve(pool.target, stake1Amount);
     await pool.connect(accounts[1]).deposit(stake1Amount);
 
     let stake2Amount = 10n;
-    await cakeLP.connect(accounts[2]).approve(pool.target, stake2Amount);
+    await stakingToken.connect(accounts[2]).approve(pool.target, stake2Amount);
     await pool.connect(accounts[2]).deposit(stake2Amount);
 
     // start a new reward phase of 1000 seconds
@@ -314,7 +325,7 @@ describe("StakingRewardPool", () => {
     let period = 1000n;
     let reward = 1n * period;
 
-    await etb.approve(pool.target, reward);
+    await rewardToken.approve(pool.target, reward);
 
     let start = BigInt(await time.latest());
     let end = start + period;
@@ -322,8 +333,8 @@ describe("StakingRewardPool", () => {
     await pool.newRewardPeriod(reward, start, end);
 
     // reward balances before staking
-    let rewardBalance1Before = await etb.balanceOf(accounts[1].address);
-    let rewardBalance2Before = await etb.balanceOf(accounts[2].address);
+    let rewardBalance1Before = await rewardToken.balanceOf(accounts[1].address);
+    let rewardBalance2Before = await rewardToken.balanceOf(accounts[2].address);
 
     // start 1st stake
     await time.increase(30);
@@ -346,8 +357,8 @@ describe("StakingRewardPool", () => {
     await pool.connect(accounts[2]).endStake(stake2Amount);
 
     // get reward balance after
-    let rewardBalance1After = await etb.balanceOf(accounts[1].address);
-    let rewardBalance2After = await etb.balanceOf(accounts[2].address);
+    let rewardBalance1After = await rewardToken.balanceOf(accounts[1].address);
+    let rewardBalance2After = await rewardToken.balanceOf(accounts[2].address);
 
     let rewardEarned1 = rewardBalance1After - rewardBalance1Before;
     let rewardEarned2 = rewardBalance2After - rewardBalance2Before;
@@ -359,27 +370,28 @@ describe("StakingRewardPool", () => {
   });
 
   it("The reward of several stakes from 2 accounts should be proportional to the amount and time of the tokens staked", async () => {
-    const { pool, etb, cakeLP, accounts } = await loadFixture(fixture);
+    const { pool, rewardToken, stakingToken, accounts } =
+      await loadFixture(fixture);
 
     // deposit lp tokens
     let stake = 100n;
     let stake1Amount = 1n * stake;
-    await cakeLP.connect(accounts[1]).approve(pool.target, stake1Amount);
+    await stakingToken.connect(accounts[1]).approve(pool.target, stake1Amount);
     await pool.connect(accounts[1]).deposit(stake1Amount);
 
     let stake2Amount = 3n * stake;
-    await cakeLP.connect(accounts[2]).approve(pool.target, stake2Amount);
+    await stakingToken.connect(accounts[2]).approve(pool.target, stake2Amount);
     await pool.connect(accounts[2]).deposit(stake2Amount);
 
-    let rewardBalance1Before = await etb.balanceOf(accounts[1].address);
-    let rewardBalance2Before = await etb.balanceOf(accounts[2].address);
+    let rewardBalance1Before = await rewardToken.balanceOf(accounts[1].address);
+    let rewardBalance2Before = await rewardToken.balanceOf(accounts[2].address);
 
     // start a new reward phase of 10 days of 100 seconds
     let day = 100n;
     let rewardPeriod = 20n * day;
     let reward = 1n * rewardPeriod;
 
-    await etb.approve(pool.target, reward);
+    await rewardToken.approve(pool.target, reward);
 
     let start = BigInt(await time.latest());
     let end = start + rewardPeriod;
@@ -442,8 +454,8 @@ describe("StakingRewardPool", () => {
       "Account 2 should not have any reward to claim after ending stake",
     );
 
-    let rewardBalance1After = await etb.balanceOf(accounts[1].address);
-    let rewardBalance2After = await etb.balanceOf(accounts[2].address);
+    let rewardBalance1After = await rewardToken.balanceOf(accounts[1].address);
+    let rewardBalance2After = await rewardToken.balanceOf(accounts[2].address);
     let rewardEarned1 = rewardBalance1After - rewardBalance1Before;
     let rewardEarned2 = rewardBalance2After - rewardBalance2Before;
     let totalRewardDistributed = rewardEarned1 + rewardEarned2;
