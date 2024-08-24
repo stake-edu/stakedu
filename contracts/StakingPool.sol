@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 pragma abicoder v2;
 
 import "./Wallet.sol";
-import "../node_modules/@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract StakingPool is Wallet {
     using SafeMath for uint256;

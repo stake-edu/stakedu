@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 pragma abicoder v2;
 
 import "./StakingPool.sol";
-import "../node_modules/@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
  * Pool contract to distribute reward tokens among LP token stakers proportionally to the amount and duration of the their stakes.
