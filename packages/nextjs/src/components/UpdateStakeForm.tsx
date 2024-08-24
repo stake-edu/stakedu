@@ -28,6 +28,7 @@ const UpdateStakeForm: React.FC<{
     !Number.isNaN(Number(amount)) &&
     parseEther(amount) <= balance;
 
+  const approve = (args: any) => {};
   const isSufficientAllowance = true;
   // const account = useAccount();
   // const allowance = useReadErc20Allowance({
