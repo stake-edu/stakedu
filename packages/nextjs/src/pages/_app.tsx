@@ -19,6 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
+        <title>Stake EDU - Earn OC Points</title>
         // Responsive meta tag
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
