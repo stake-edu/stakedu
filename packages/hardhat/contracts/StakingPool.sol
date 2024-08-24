@@ -15,7 +15,7 @@ contract StakingPool is Wallet {
 
     constructor(address, address _lpTokenAddress) Wallet(_lpTokenAddress) {}
 
-    function depositAndStartStake(uint256 amount) public {
+    function depositAndStartStake(uint256 amount) public payable {
         deposit(amount);
         startStake(amount);
     }

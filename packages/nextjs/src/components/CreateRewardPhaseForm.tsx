@@ -148,7 +148,7 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
               onChange={(e) => setAmount(e.target.value)}
             />
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-gray-500 sm:text-sm">ETB</span>
+              <span className="text-gray-500 sm:text-sm">RewardToken</span>
             </div>
           </div>
         </div>

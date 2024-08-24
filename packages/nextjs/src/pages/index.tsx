@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 
 import { AlertDismissible } from "../components/AlertDismissible";
 import Header from "../components/Header";
@@ -20,10 +20,12 @@ const IndexPage = () => {
     address: ADDRESS_POOL,
     account: account.address,
   });
-  const unstaked = useReadErc20BalanceOf({
-    address: ADDRESS_TOKEN_STAKING,
-    args: [account.address!],
-  });
+  const unstaked = useBalance({ address: account.address });
+  // const unstaked = useReadErc20BalanceOf({
+  //   address: ADDRESS_TOKEN_STAKING,
+  //   args: [account.address!],
+  // });
+
   const staked = useReadStakingPoolGetStakedBalance({
     address: ADDRESS_POOL,
     account: account.address,
@@ -89,13 +91,13 @@ const IndexPage = () => {
                 Balance not yet staked
                 <div>
                   <span className="text-2xl font-semibold text-purple-800">
-                    {format(unstaked?.data)}{" "}
+                    {format(unstaked?.data?.value)}{" "}
                   </span>
                   <span className="ml-2 text-sm">EDU</span>
                 </div>
               </div>
               <StakeView
-                lpUnstaked={unstaked?.data}
+                lpUnstaked={unstaked?.data?.value}
                 lpStaked={staked?.data}
                 handleSuccess={handleSuccess}
                 handleError={handleError}

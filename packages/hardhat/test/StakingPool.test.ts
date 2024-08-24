@@ -8,7 +8,7 @@ import hre from "hardhat";
 
 describe("StakingPool", () => {
   async function fixture() {
-    const stakingToken = await hre.ethers.deployContract("CakeLP");
+    const stakingToken = await hre.ethers.deployContract("StakingToken");
 
     const POOL = await hre.ethers.getContractFactory("StakingPool");
     const pool = await POOL.deploy(ZeroAddress, stakingToken.target);

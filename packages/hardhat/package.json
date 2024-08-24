@@ -5,6 +5,7 @@
   "scripts": {
     "format": "prettier --write .",
     "hardhat": "hardhat",
+    "deploy": "hardhat deploy --network opencampus && hardhat etherscan-verify --network opencampus",
     "test": "hardhat test"
   },
   "author": "",

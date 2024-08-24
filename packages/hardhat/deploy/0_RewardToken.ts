@@ -6,7 +6,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const [deployer] = await getUnnamedAccounts();
 
-  await deploy("ETB", {
+  await deploy("RewardToken", {
     from: deployer,
     log: true,
   });

@@ -9,8 +9,8 @@ describe("StakingRewardPool", () => {
   async function fixture() {
     const accounts = await ethers.getSigners();
 
-    const rewardToken = await hre.ethers.deployContract("ETB");
-    const stakingToken = await hre.ethers.deployContract("CakeLP");
+    const rewardToken = await hre.ethers.deployContract("RewardToken");
+    const stakingToken = await hre.ethers.deployContract("StakingToken");
 
     const POOL = await hre.ethers.getContractFactory("StakingRewardPool");
     const pool = await POOL.deploy(rewardToken.target, stakingToken.target);

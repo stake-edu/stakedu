@@ -12,10 +12,10 @@ import {
 } from "wagmi/codegen";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// CakeLP
+// RewardToken
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const cakeLpAbi = [
+export const rewardTokenAbi = [
   { type: "constructor", inputs: [], stateMutability: "nonpayable" },
   {
     type: "error",
@@ -169,196 +169,6 @@ export const cakeLpAbi = [
     ],
     name: "transferFrom",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "nonpayable",
-  },
-] as const;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ETB
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const etbAbi = [
-  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
-  {
-    type: "error",
-    inputs: [
-      { name: "spender", internalType: "address", type: "address" },
-      { name: "allowance", internalType: "uint256", type: "uint256" },
-      { name: "needed", internalType: "uint256", type: "uint256" },
-    ],
-    name: "ERC20InsufficientAllowance",
-  },
-  {
-    type: "error",
-    inputs: [
-      { name: "sender", internalType: "address", type: "address" },
-      { name: "balance", internalType: "uint256", type: "uint256" },
-      { name: "needed", internalType: "uint256", type: "uint256" },
-    ],
-    name: "ERC20InsufficientBalance",
-  },
-  {
-    type: "error",
-    inputs: [{ name: "approver", internalType: "address", type: "address" }],
-    name: "ERC20InvalidApprover",
-  },
-  {
-    type: "error",
-    inputs: [{ name: "receiver", internalType: "address", type: "address" }],
-    name: "ERC20InvalidReceiver",
-  },
-  {
-    type: "error",
-    inputs: [{ name: "sender", internalType: "address", type: "address" }],
-    name: "ERC20InvalidSender",
-  },
-  {
-    type: "error",
-    inputs: [{ name: "spender", internalType: "address", type: "address" }],
-    name: "ERC20InvalidSpender",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "owner",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "spender",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "value",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-    ],
-    name: "Approval",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      { name: "from", internalType: "address", type: "address", indexed: true },
-      { name: "to", internalType: "address", type: "address", indexed: true },
-      {
-        name: "value",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-    ],
-    name: "Transfer",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "owner", internalType: "address", type: "address" },
-      { name: "spender", internalType: "address", type: "address" },
-    ],
-    name: "allowance",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "spender", internalType: "address", type: "address" },
-      { name: "value", internalType: "uint256", type: "uint256" },
-    ],
-    name: "approve",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    inputs: [{ name: "account", internalType: "address", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "decimals",
-    outputs: [{ name: "", internalType: "uint8", type: "uint8" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "name",
-    outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "symbol",
-    outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "totalSupply",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "to", internalType: "address", type: "address" },
-      { name: "value", internalType: "uint256", type: "uint256" },
-    ],
-    name: "transfer",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "from", internalType: "address", type: "address" },
-      { name: "to", internalType: "address", type: "address" },
-      { name: "value", internalType: "uint256", type: "uint256" },
-    ],
-    name: "transferFrom",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "nonpayable",
-  },
-] as const;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Migrations
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const migrationsAbi = [
-  {
-    type: "function",
-    inputs: [],
-    name: "last_completed_migration",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "owner",
-    outputs: [{ name: "", internalType: "address", type: "address" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [{ name: "completed", internalType: "uint256", type: "uint256" }],
-    name: "setCompleted",
-    outputs: [],
     stateMutability: "nonpayable",
   },
 ] as const;
@@ -489,14 +299,14 @@ export const stakingPoolAbi = [
     inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
     name: "deposit",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
     inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
     name: "depositAndStartStake",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -745,14 +555,14 @@ export const stakingRewardPoolAbi = [
     inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
     name: "deposit",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
     inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
     name: "depositAndStartStake",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -931,6 +741,168 @@ export const stakingRewardPoolAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// StakingToken
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const stakingTokenAbi = [
+  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
+  {
+    type: "error",
+    inputs: [
+      { name: "spender", internalType: "address", type: "address" },
+      { name: "allowance", internalType: "uint256", type: "uint256" },
+      { name: "needed", internalType: "uint256", type: "uint256" },
+    ],
+    name: "ERC20InsufficientAllowance",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "sender", internalType: "address", type: "address" },
+      { name: "balance", internalType: "uint256", type: "uint256" },
+      { name: "needed", internalType: "uint256", type: "uint256" },
+    ],
+    name: "ERC20InsufficientBalance",
+  },
+  {
+    type: "error",
+    inputs: [{ name: "approver", internalType: "address", type: "address" }],
+    name: "ERC20InvalidApprover",
+  },
+  {
+    type: "error",
+    inputs: [{ name: "receiver", internalType: "address", type: "address" }],
+    name: "ERC20InvalidReceiver",
+  },
+  {
+    type: "error",
+    inputs: [{ name: "sender", internalType: "address", type: "address" }],
+    name: "ERC20InvalidSender",
+  },
+  {
+    type: "error",
+    inputs: [{ name: "spender", internalType: "address", type: "address" }],
+    name: "ERC20InvalidSpender",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "owner",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "spender",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "value",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "Approval",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      { name: "from", internalType: "address", type: "address", indexed: true },
+      { name: "to", internalType: "address", type: "address", indexed: true },
+      {
+        name: "value",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "Transfer",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "owner", internalType: "address", type: "address" },
+      { name: "spender", internalType: "address", type: "address" },
+    ],
+    name: "allowance",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "spender", internalType: "address", type: "address" },
+      { name: "value", internalType: "uint256", type: "uint256" },
+    ],
+    name: "approve",
+    outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    inputs: [{ name: "account", internalType: "address", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "decimals",
+    outputs: [{ name: "", internalType: "uint8", type: "uint8" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "name",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "symbol",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "totalSupply",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "to", internalType: "address", type: "address" },
+      { name: "value", internalType: "uint256", type: "uint256" },
+    ],
+    name: "transfer",
+    outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "from", internalType: "address", type: "address" },
+      { name: "to", internalType: "address", type: "address" },
+      { name: "value", internalType: "uint256", type: "uint256" },
+    ],
+    name: "transferFrom",
+    outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "nonpayable",
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Wallet
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1025,7 +997,7 @@ export const walletAbi = [
     inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
     name: "deposit",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -1170,332 +1142,145 @@ export const erc20Abi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link cakeLpAbi}__
+ * Wraps __{@link readContract}__ with `abi` set to __{@link rewardTokenAbi}__
  */
-export const readCakeLp = /*#__PURE__*/ createReadContract({ abi: cakeLpAbi });
+export const readRewardToken = /*#__PURE__*/ createReadContract({
+  abi: rewardTokenAbi,
+});
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"allowance"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"allowance"`
  */
-export const readCakeLpAllowance = /*#__PURE__*/ createReadContract({
-  abi: cakeLpAbi,
+export const readRewardTokenAllowance = /*#__PURE__*/ createReadContract({
+  abi: rewardTokenAbi,
   functionName: "allowance",
 });
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"balanceOf"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"balanceOf"`
  */
-export const readCakeLpBalanceOf = /*#__PURE__*/ createReadContract({
-  abi: cakeLpAbi,
+export const readRewardTokenBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: rewardTokenAbi,
   functionName: "balanceOf",
 });
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"decimals"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"decimals"`
  */
-export const readCakeLpDecimals = /*#__PURE__*/ createReadContract({
-  abi: cakeLpAbi,
+export const readRewardTokenDecimals = /*#__PURE__*/ createReadContract({
+  abi: rewardTokenAbi,
   functionName: "decimals",
 });
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"name"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"name"`
  */
-export const readCakeLpName = /*#__PURE__*/ createReadContract({
-  abi: cakeLpAbi,
+export const readRewardTokenName = /*#__PURE__*/ createReadContract({
+  abi: rewardTokenAbi,
   functionName: "name",
 });
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"symbol"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"symbol"`
  */
-export const readCakeLpSymbol = /*#__PURE__*/ createReadContract({
-  abi: cakeLpAbi,
+export const readRewardTokenSymbol = /*#__PURE__*/ createReadContract({
+  abi: rewardTokenAbi,
   functionName: "symbol",
 });
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"totalSupply"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"totalSupply"`
  */
-export const readCakeLpTotalSupply = /*#__PURE__*/ createReadContract({
-  abi: cakeLpAbi,
+export const readRewardTokenTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: rewardTokenAbi,
   functionName: "totalSupply",
 });
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link cakeLpAbi}__
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link rewardTokenAbi}__
  */
-export const writeCakeLp = /*#__PURE__*/ createWriteContract({
-  abi: cakeLpAbi,
+export const writeRewardToken = /*#__PURE__*/ createWriteContract({
+  abi: rewardTokenAbi,
 });
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"approve"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"approve"`
  */
-export const writeCakeLpApprove = /*#__PURE__*/ createWriteContract({
-  abi: cakeLpAbi,
+export const writeRewardTokenApprove = /*#__PURE__*/ createWriteContract({
+  abi: rewardTokenAbi,
   functionName: "approve",
 });
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"transfer"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transfer"`
  */
-export const writeCakeLpTransfer = /*#__PURE__*/ createWriteContract({
-  abi: cakeLpAbi,
+export const writeRewardTokenTransfer = /*#__PURE__*/ createWriteContract({
+  abi: rewardTokenAbi,
   functionName: "transfer",
 });
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"transferFrom"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transferFrom"`
  */
-export const writeCakeLpTransferFrom = /*#__PURE__*/ createWriteContract({
-  abi: cakeLpAbi,
+export const writeRewardTokenTransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: rewardTokenAbi,
   functionName: "transferFrom",
 });
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link cakeLpAbi}__
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link rewardTokenAbi}__
  */
-export const simulateCakeLp = /*#__PURE__*/ createSimulateContract({
-  abi: cakeLpAbi,
+export const simulateRewardToken = /*#__PURE__*/ createSimulateContract({
+  abi: rewardTokenAbi,
 });
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"approve"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"approve"`
  */
-export const simulateCakeLpApprove = /*#__PURE__*/ createSimulateContract({
-  abi: cakeLpAbi,
+export const simulateRewardTokenApprove = /*#__PURE__*/ createSimulateContract({
+  abi: rewardTokenAbi,
   functionName: "approve",
 });
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"transfer"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transfer"`
  */
-export const simulateCakeLpTransfer = /*#__PURE__*/ createSimulateContract({
-  abi: cakeLpAbi,
-  functionName: "transfer",
-});
+export const simulateRewardTokenTransfer = /*#__PURE__*/ createSimulateContract(
+  { abi: rewardTokenAbi, functionName: "transfer" },
+);
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"transferFrom"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transferFrom"`
  */
-export const simulateCakeLpTransferFrom = /*#__PURE__*/ createSimulateContract({
-  abi: cakeLpAbi,
-  functionName: "transferFrom",
-});
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link cakeLpAbi}__
- */
-export const watchCakeLpEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: cakeLpAbi,
-});
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link cakeLpAbi}__ and `eventName` set to `"Approval"`
- */
-export const watchCakeLpApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: cakeLpAbi,
-  eventName: "Approval",
-});
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link cakeLpAbi}__ and `eventName` set to `"Transfer"`
- */
-export const watchCakeLpTransferEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: cakeLpAbi,
-  eventName: "Transfer",
-});
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link etbAbi}__
- */
-export const readEtb = /*#__PURE__*/ createReadContract({ abi: etbAbi });
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"allowance"`
- */
-export const readEtbAllowance = /*#__PURE__*/ createReadContract({
-  abi: etbAbi,
-  functionName: "allowance",
-});
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"balanceOf"`
- */
-export const readEtbBalanceOf = /*#__PURE__*/ createReadContract({
-  abi: etbAbi,
-  functionName: "balanceOf",
-});
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"decimals"`
- */
-export const readEtbDecimals = /*#__PURE__*/ createReadContract({
-  abi: etbAbi,
-  functionName: "decimals",
-});
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"name"`
- */
-export const readEtbName = /*#__PURE__*/ createReadContract({
-  abi: etbAbi,
-  functionName: "name",
-});
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"symbol"`
- */
-export const readEtbSymbol = /*#__PURE__*/ createReadContract({
-  abi: etbAbi,
-  functionName: "symbol",
-});
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"totalSupply"`
- */
-export const readEtbTotalSupply = /*#__PURE__*/ createReadContract({
-  abi: etbAbi,
-  functionName: "totalSupply",
-});
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link etbAbi}__
- */
-export const writeEtb = /*#__PURE__*/ createWriteContract({ abi: etbAbi });
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"approve"`
- */
-export const writeEtbApprove = /*#__PURE__*/ createWriteContract({
-  abi: etbAbi,
-  functionName: "approve",
-});
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"transfer"`
- */
-export const writeEtbTransfer = /*#__PURE__*/ createWriteContract({
-  abi: etbAbi,
-  functionName: "transfer",
-});
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const writeEtbTransferFrom = /*#__PURE__*/ createWriteContract({
-  abi: etbAbi,
-  functionName: "transferFrom",
-});
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link etbAbi}__
- */
-export const simulateEtb = /*#__PURE__*/ createSimulateContract({
-  abi: etbAbi,
-});
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"approve"`
- */
-export const simulateEtbApprove = /*#__PURE__*/ createSimulateContract({
-  abi: etbAbi,
-  functionName: "approve",
-});
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"transfer"`
- */
-export const simulateEtbTransfer = /*#__PURE__*/ createSimulateContract({
-  abi: etbAbi,
-  functionName: "transfer",
-});
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const simulateEtbTransferFrom = /*#__PURE__*/ createSimulateContract({
-  abi: etbAbi,
-  functionName: "transferFrom",
-});
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link etbAbi}__
- */
-export const watchEtbEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: etbAbi,
-});
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link etbAbi}__ and `eventName` set to `"Approval"`
- */
-export const watchEtbApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: etbAbi,
-  eventName: "Approval",
-});
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link etbAbi}__ and `eventName` set to `"Transfer"`
- */
-export const watchEtbTransferEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: etbAbi,
-  eventName: "Transfer",
-});
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link migrationsAbi}__
- */
-export const readMigrations = /*#__PURE__*/ createReadContract({
-  abi: migrationsAbi,
-});
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link migrationsAbi}__ and `functionName` set to `"last_completed_migration"`
- */
-export const readMigrationsLastCompletedMigration =
-  /*#__PURE__*/ createReadContract({
-    abi: migrationsAbi,
-    functionName: "last_completed_migration",
+export const simulateRewardTokenTransferFrom =
+  /*#__PURE__*/ createSimulateContract({
+    abi: rewardTokenAbi,
+    functionName: "transferFrom",
   });
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link migrationsAbi}__ and `functionName` set to `"owner"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__
  */
-export const readMigrationsOwner = /*#__PURE__*/ createReadContract({
-  abi: migrationsAbi,
-  functionName: "owner",
+export const watchRewardTokenEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: rewardTokenAbi,
 });
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link migrationsAbi}__
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__ and `eventName` set to `"Approval"`
  */
-export const writeMigrations = /*#__PURE__*/ createWriteContract({
-  abi: migrationsAbi,
-});
+export const watchRewardTokenApprovalEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: rewardTokenAbi,
+    eventName: "Approval",
+  });
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link migrationsAbi}__ and `functionName` set to `"setCompleted"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__ and `eventName` set to `"Transfer"`
  */
-export const writeMigrationsSetCompleted = /*#__PURE__*/ createWriteContract({
-  abi: migrationsAbi,
-  functionName: "setCompleted",
-});
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link migrationsAbi}__
- */
-export const simulateMigrations = /*#__PURE__*/ createSimulateContract({
-  abi: migrationsAbi,
-});
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link migrationsAbi}__ and `functionName` set to `"setCompleted"`
- */
-export const simulateMigrationsSetCompleted =
-  /*#__PURE__*/ createSimulateContract({
-    abi: migrationsAbi,
-    functionName: "setCompleted",
+export const watchRewardTokenTransferEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: rewardTokenAbi,
+    eventName: "Transfer",
   });
 
 /**
@@ -2147,6 +1932,149 @@ export const watchStakingRewardPoolWithdrawnEvent =
   });
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link stakingTokenAbi}__
+ */
+export const readStakingToken = /*#__PURE__*/ createReadContract({
+  abi: stakingTokenAbi,
+});
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"allowance"`
+ */
+export const readStakingTokenAllowance = /*#__PURE__*/ createReadContract({
+  abi: stakingTokenAbi,
+  functionName: "allowance",
+});
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const readStakingTokenBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: stakingTokenAbi,
+  functionName: "balanceOf",
+});
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"decimals"`
+ */
+export const readStakingTokenDecimals = /*#__PURE__*/ createReadContract({
+  abi: stakingTokenAbi,
+  functionName: "decimals",
+});
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"name"`
+ */
+export const readStakingTokenName = /*#__PURE__*/ createReadContract({
+  abi: stakingTokenAbi,
+  functionName: "name",
+});
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"symbol"`
+ */
+export const readStakingTokenSymbol = /*#__PURE__*/ createReadContract({
+  abi: stakingTokenAbi,
+  functionName: "symbol",
+});
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const readStakingTokenTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: stakingTokenAbi,
+  functionName: "totalSupply",
+});
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link stakingTokenAbi}__
+ */
+export const writeStakingToken = /*#__PURE__*/ createWriteContract({
+  abi: stakingTokenAbi,
+});
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const writeStakingTokenApprove = /*#__PURE__*/ createWriteContract({
+  abi: stakingTokenAbi,
+  functionName: "approve",
+});
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const writeStakingTokenTransfer = /*#__PURE__*/ createWriteContract({
+  abi: stakingTokenAbi,
+  functionName: "transfer",
+});
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const writeStakingTokenTransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: stakingTokenAbi,
+  functionName: "transferFrom",
+});
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link stakingTokenAbi}__
+ */
+export const simulateStakingToken = /*#__PURE__*/ createSimulateContract({
+  abi: stakingTokenAbi,
+});
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const simulateStakingTokenApprove = /*#__PURE__*/ createSimulateContract(
+  { abi: stakingTokenAbi, functionName: "approve" },
+);
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const simulateStakingTokenTransfer =
+  /*#__PURE__*/ createSimulateContract({
+    abi: stakingTokenAbi,
+    functionName: "transfer",
+  });
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const simulateStakingTokenTransferFrom =
+  /*#__PURE__*/ createSimulateContract({
+    abi: stakingTokenAbi,
+    functionName: "transferFrom",
+  });
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link stakingTokenAbi}__
+ */
+export const watchStakingTokenEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: stakingTokenAbi,
+});
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link stakingTokenAbi}__ and `eventName` set to `"Approval"`
+ */
+export const watchStakingTokenApprovalEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: stakingTokenAbi,
+    eventName: "Approval",
+  });
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link stakingTokenAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const watchStakingTokenTransferEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: stakingTokenAbi,
+    eventName: "Transfer",
+  });
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link walletAbi}__
  */
 export const readWallet = /*#__PURE__*/ createReadContract({ abi: walletAbi });
@@ -2426,343 +2354,148 @@ export const watchErc20TransferEvent = /*#__PURE__*/ createWatchContractEvent({
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link cakeLpAbi}__
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__
  */
-export const useReadCakeLp = /*#__PURE__*/ createUseReadContract({
-  abi: cakeLpAbi,
+export const useReadRewardToken = /*#__PURE__*/ createUseReadContract({
+  abi: rewardTokenAbi,
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"allowance"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"allowance"`
  */
-export const useReadCakeLpAllowance = /*#__PURE__*/ createUseReadContract({
-  abi: cakeLpAbi,
+export const useReadRewardTokenAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: rewardTokenAbi,
   functionName: "allowance",
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"balanceOf"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"balanceOf"`
  */
-export const useReadCakeLpBalanceOf = /*#__PURE__*/ createUseReadContract({
-  abi: cakeLpAbi,
+export const useReadRewardTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: rewardTokenAbi,
   functionName: "balanceOf",
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"decimals"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"decimals"`
  */
-export const useReadCakeLpDecimals = /*#__PURE__*/ createUseReadContract({
-  abi: cakeLpAbi,
+export const useReadRewardTokenDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: rewardTokenAbi,
   functionName: "decimals",
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"name"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"name"`
  */
-export const useReadCakeLpName = /*#__PURE__*/ createUseReadContract({
-  abi: cakeLpAbi,
+export const useReadRewardTokenName = /*#__PURE__*/ createUseReadContract({
+  abi: rewardTokenAbi,
   functionName: "name",
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"symbol"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"symbol"`
  */
-export const useReadCakeLpSymbol = /*#__PURE__*/ createUseReadContract({
-  abi: cakeLpAbi,
+export const useReadRewardTokenSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: rewardTokenAbi,
   functionName: "symbol",
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"totalSupply"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"totalSupply"`
  */
-export const useReadCakeLpTotalSupply = /*#__PURE__*/ createUseReadContract({
-  abi: cakeLpAbi,
-  functionName: "totalSupply",
+export const useReadRewardTokenTotalSupply =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardTokenAbi,
+    functionName: "totalSupply",
+  });
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__
+ */
+export const useWriteRewardToken = /*#__PURE__*/ createUseWriteContract({
+  abi: rewardTokenAbi,
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link cakeLpAbi}__
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"approve"`
  */
-export const useWriteCakeLp = /*#__PURE__*/ createUseWriteContract({
-  abi: cakeLpAbi,
-});
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"approve"`
- */
-export const useWriteCakeLpApprove = /*#__PURE__*/ createUseWriteContract({
-  abi: cakeLpAbi,
+export const useWriteRewardTokenApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: rewardTokenAbi,
   functionName: "approve",
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"transfer"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transfer"`
  */
-export const useWriteCakeLpTransfer = /*#__PURE__*/ createUseWriteContract({
-  abi: cakeLpAbi,
-  functionName: "transfer",
-});
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const useWriteCakeLpTransferFrom = /*#__PURE__*/ createUseWriteContract({
-  abi: cakeLpAbi,
-  functionName: "transferFrom",
-});
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link cakeLpAbi}__
- */
-export const useSimulateCakeLp = /*#__PURE__*/ createUseSimulateContract({
-  abi: cakeLpAbi,
-});
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"approve"`
- */
-export const useSimulateCakeLpApprove = /*#__PURE__*/ createUseSimulateContract(
-  { abi: cakeLpAbi, functionName: "approve" },
+export const useWriteRewardTokenTransfer = /*#__PURE__*/ createUseWriteContract(
+  { abi: rewardTokenAbi, functionName: "transfer" },
 );
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"transfer"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transferFrom"`
  */
-export const useSimulateCakeLpTransfer =
+export const useWriteRewardTokenTransferFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardTokenAbi,
+    functionName: "transferFrom",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__
+ */
+export const useSimulateRewardToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: rewardTokenAbi,
+});
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateRewardTokenApprove =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: cakeLpAbi,
+    abi: rewardTokenAbi,
+    functionName: "approve",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateRewardTokenTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardTokenAbi,
     functionName: "transfer",
   });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link cakeLpAbi}__ and `functionName` set to `"transferFrom"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transferFrom"`
  */
-export const useSimulateCakeLpTransferFrom =
+export const useSimulateRewardTokenTransferFrom =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: cakeLpAbi,
+    abi: rewardTokenAbi,
     functionName: "transferFrom",
   });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link cakeLpAbi}__
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__
  */
-export const useWatchCakeLpEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: cakeLpAbi,
-});
+export const useWatchRewardTokenEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: rewardTokenAbi });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link cakeLpAbi}__ and `eventName` set to `"Approval"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__ and `eventName` set to `"Approval"`
  */
-export const useWatchCakeLpApprovalEvent =
+export const useWatchRewardTokenApprovalEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
-    abi: cakeLpAbi,
+    abi: rewardTokenAbi,
     eventName: "Approval",
   });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link cakeLpAbi}__ and `eventName` set to `"Transfer"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__ and `eventName` set to `"Transfer"`
  */
-export const useWatchCakeLpTransferEvent =
+export const useWatchRewardTokenTransferEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
-    abi: cakeLpAbi,
+    abi: rewardTokenAbi,
     eventName: "Transfer",
-  });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link etbAbi}__
- */
-export const useReadEtb = /*#__PURE__*/ createUseReadContract({ abi: etbAbi });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"allowance"`
- */
-export const useReadEtbAllowance = /*#__PURE__*/ createUseReadContract({
-  abi: etbAbi,
-  functionName: "allowance",
-});
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"balanceOf"`
- */
-export const useReadEtbBalanceOf = /*#__PURE__*/ createUseReadContract({
-  abi: etbAbi,
-  functionName: "balanceOf",
-});
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"decimals"`
- */
-export const useReadEtbDecimals = /*#__PURE__*/ createUseReadContract({
-  abi: etbAbi,
-  functionName: "decimals",
-});
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"name"`
- */
-export const useReadEtbName = /*#__PURE__*/ createUseReadContract({
-  abi: etbAbi,
-  functionName: "name",
-});
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"symbol"`
- */
-export const useReadEtbSymbol = /*#__PURE__*/ createUseReadContract({
-  abi: etbAbi,
-  functionName: "symbol",
-});
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"totalSupply"`
- */
-export const useReadEtbTotalSupply = /*#__PURE__*/ createUseReadContract({
-  abi: etbAbi,
-  functionName: "totalSupply",
-});
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link etbAbi}__
- */
-export const useWriteEtb = /*#__PURE__*/ createUseWriteContract({
-  abi: etbAbi,
-});
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"approve"`
- */
-export const useWriteEtbApprove = /*#__PURE__*/ createUseWriteContract({
-  abi: etbAbi,
-  functionName: "approve",
-});
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"transfer"`
- */
-export const useWriteEtbTransfer = /*#__PURE__*/ createUseWriteContract({
-  abi: etbAbi,
-  functionName: "transfer",
-});
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const useWriteEtbTransferFrom = /*#__PURE__*/ createUseWriteContract({
-  abi: etbAbi,
-  functionName: "transferFrom",
-});
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link etbAbi}__
- */
-export const useSimulateEtb = /*#__PURE__*/ createUseSimulateContract({
-  abi: etbAbi,
-});
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"approve"`
- */
-export const useSimulateEtbApprove = /*#__PURE__*/ createUseSimulateContract({
-  abi: etbAbi,
-  functionName: "approve",
-});
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"transfer"`
- */
-export const useSimulateEtbTransfer = /*#__PURE__*/ createUseSimulateContract({
-  abi: etbAbi,
-  functionName: "transfer",
-});
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link etbAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const useSimulateEtbTransferFrom =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: etbAbi,
-    functionName: "transferFrom",
-  });
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link etbAbi}__
- */
-export const useWatchEtbEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: etbAbi,
-});
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link etbAbi}__ and `eventName` set to `"Approval"`
- */
-export const useWatchEtbApprovalEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: etbAbi,
-    eventName: "Approval",
-  });
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link etbAbi}__ and `eventName` set to `"Transfer"`
- */
-export const useWatchEtbTransferEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: etbAbi,
-    eventName: "Transfer",
-  });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link migrationsAbi}__
- */
-export const useReadMigrations = /*#__PURE__*/ createUseReadContract({
-  abi: migrationsAbi,
-});
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link migrationsAbi}__ and `functionName` set to `"last_completed_migration"`
- */
-export const useReadMigrationsLastCompletedMigration =
-  /*#__PURE__*/ createUseReadContract({
-    abi: migrationsAbi,
-    functionName: "last_completed_migration",
-  });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link migrationsAbi}__ and `functionName` set to `"owner"`
- */
-export const useReadMigrationsOwner = /*#__PURE__*/ createUseReadContract({
-  abi: migrationsAbi,
-  functionName: "owner",
-});
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link migrationsAbi}__
- */
-export const useWriteMigrations = /*#__PURE__*/ createUseWriteContract({
-  abi: migrationsAbi,
-});
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link migrationsAbi}__ and `functionName` set to `"setCompleted"`
- */
-export const useWriteMigrationsSetCompleted =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: migrationsAbi,
-    functionName: "setCompleted",
-  });
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link migrationsAbi}__
- */
-export const useSimulateMigrations = /*#__PURE__*/ createUseSimulateContract({
-  abi: migrationsAbi,
-});
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link migrationsAbi}__ and `functionName` set to `"setCompleted"`
- */
-export const useSimulateMigrationsSetCompleted =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: migrationsAbi,
-    functionName: "setCompleted",
   });
 
 /**
@@ -3426,6 +3159,150 @@ export const useWatchStakingRewardPoolWithdrawnEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: stakingRewardPoolAbi,
     eventName: "Withdrawn",
+  });
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link stakingTokenAbi}__
+ */
+export const useReadStakingToken = /*#__PURE__*/ createUseReadContract({
+  abi: stakingTokenAbi,
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadStakingTokenAllowance = /*#__PURE__*/ createUseReadContract(
+  { abi: stakingTokenAbi, functionName: "allowance" },
+);
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadStakingTokenBalanceOf = /*#__PURE__*/ createUseReadContract(
+  { abi: stakingTokenAbi, functionName: "balanceOf" },
+);
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"decimals"`
+ */
+export const useReadStakingTokenDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: stakingTokenAbi,
+  functionName: "decimals",
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"name"`
+ */
+export const useReadStakingTokenName = /*#__PURE__*/ createUseReadContract({
+  abi: stakingTokenAbi,
+  functionName: "name",
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"symbol"`
+ */
+export const useReadStakingTokenSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: stakingTokenAbi,
+  functionName: "symbol",
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadStakingTokenTotalSupply =
+  /*#__PURE__*/ createUseReadContract({
+    abi: stakingTokenAbi,
+    functionName: "totalSupply",
+  });
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link stakingTokenAbi}__
+ */
+export const useWriteStakingToken = /*#__PURE__*/ createUseWriteContract({
+  abi: stakingTokenAbi,
+});
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteStakingTokenApprove = /*#__PURE__*/ createUseWriteContract(
+  { abi: stakingTokenAbi, functionName: "approve" },
+);
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteStakingTokenTransfer =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: stakingTokenAbi,
+    functionName: "transfer",
+  });
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteStakingTokenTransferFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: stakingTokenAbi,
+    functionName: "transferFrom",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link stakingTokenAbi}__
+ */
+export const useSimulateStakingToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: stakingTokenAbi,
+});
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateStakingTokenApprove =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: stakingTokenAbi,
+    functionName: "approve",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateStakingTokenTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: stakingTokenAbi,
+    functionName: "transfer",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link stakingTokenAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateStakingTokenTransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: stakingTokenAbi,
+    functionName: "transferFrom",
+  });
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link stakingTokenAbi}__
+ */
+export const useWatchStakingTokenEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: stakingTokenAbi });
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link stakingTokenAbi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchStakingTokenApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: stakingTokenAbi,
+    eventName: "Approval",
+  });
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link stakingTokenAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchStakingTokenTransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: stakingTokenAbi,
+    eventName: "Transfer",
   });
 
 /**

@@ -6,13 +6,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const [deployer] = await getUnnamedAccounts();
 
-  const rewardToken = await deployments.get("ETB");
-  const stakingToken = await deployments.get("CakeLP");
+  const rewardToken = await deployments.get("RewardToken");
+  const stakingTokenAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
   await deploy("StakingRewardPool", {
     from: deployer,
     log: true,
-    args: [rewardToken.address, stakingToken.address],
+    args: [rewardToken.address, stakingTokenAddress],
   });
 };
 

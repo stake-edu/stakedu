@@ -5,7 +5,7 @@ import hre from "hardhat";
 
 describe("Wallet", function () {
   async function fixture() {
-    const stakingToken = await hre.ethers.deployContract("CakeLP");
+    const stakingToken = await hre.ethers.deployContract("StakingToken");
 
     const Wallet = await hre.ethers.getContractFactory("Wallet");
     const wallet = await Wallet.deploy(stakingToken.target);
