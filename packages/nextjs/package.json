@@ -3,18 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "hardhat": "hardhat",
-    "dev": "npm run artifacts && next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "format": "prettier --write .",
-    "artifacts": "cp -r ./build/contracts/ ./src/web3/artifacts",
-    "test": "hardhat test"
+    "format": "prettier --write ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/contracts": "5.0.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "bootstrap": "^5.0.0-beta3",
@@ -26,15 +22,12 @@
     "react-bootstrap": "^1.6.1",
     "react-datepicker": "^4.2.1",
     "react-dom": "^18.3.1",
+    "truffle-contract": "^4.0.31",
     "web3": "^1.5.2"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "babel-plugin-inline-react-svg": "^1.0.1",
-    "hardhat": "^2.22.9",
-    "hardhat-deploy": "^0.12.4",
-    "hardhat-deploy-ethers": "^0.4.2",
     "prettier": "3.3.3",
     "prettier-plugin-solidity": "^1.4.0",
     "typescript": "5.5.4"

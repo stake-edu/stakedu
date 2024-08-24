@@ -10,7 +10,7 @@ import {
   Row,
 } from "react-bootstrap";
 
-import { Center, Wrapped } from "../components/Layout";
+import { Center, Wrapped } from "./Layout";
 import { claimReward } from "../web3/stakes";
 import Modal from "./Modal";
 import RewardsInfo from "./RewardsInfo";

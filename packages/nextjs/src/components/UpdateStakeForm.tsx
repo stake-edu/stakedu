@@ -10,7 +10,7 @@ import {
   Row,
 } from "react-bootstrap";
 
-import { Center } from "../components/Layout";
+import { Center } from "./Layout";
 import { approve, getAllowance } from "../web3/cake_lp";
 import { endStake, startStake } from "../web3/stakes";
 
