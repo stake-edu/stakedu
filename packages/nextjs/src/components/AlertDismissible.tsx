@@ -1,24 +1,54 @@
-import React, { useState } from "react";
-import { Alert, Button } from "react-bootstrap";
+import React, { ReactNode, useState } from "react";
 
-export const AlertDismissible = ({ ...props }) => {
+interface AlertDismissibleProps {
+  variant: "info" | "success" | "warning" | "error";
+  title: string;
+  children: ReactNode;
+  buttonTitle?: string;
+  buttonAction?: () => void;
+}
+
+export const AlertDismissible: React.FC<AlertDismissibleProps> = ({
+  variant,
+  title,
+  children,
+  buttonTitle = "Close",
+  buttonAction,
+}) => {
   const [show, setShow] = useState(true);
-  const buttonTitle = props.buttonTitle || "Close";
-  const buttonAction = props.buttonAction || (() => setShow(false));
+
+  const handleButtonAction = buttonAction || (() => setShow(false));
+
+  if (!show) return null;
+
+  const variantStyles = {
+    info: "bg-blue-100 border-blue-500 text-blue-700",
+    success: "bg-green-100 border-green-500 text-green-700",
+    warning: "bg-yellow-100 border-yellow-500 text-yellow-700",
+    error: "bg-red-100 border-red-500 text-red-700",
+  };
 
   return (
-    <>
-      <Alert show={show} variant={props.variant}>
-        <Alert.Heading>{props.title}</Alert.Heading>
-        <p> {props.children} </p>
-        <hr />
-        <div className="d-flex justify-content-end">
-          <Button onClick={buttonAction} variant={`outline-${props.variant}`}>
-            {buttonTitle}
-          </Button>
-        </div>
-      </Alert>
-    </>
+    <div className={`border-l-4 p-4 ${variantStyles[variant]}`}>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="font-bold">{title}</h3>
+        <button
+          onClick={handleButtonAction}
+          className={`px-4 py-2 rounded text-sm font-medium border ${
+            variant === "info"
+              ? "border-blue-500 text-blue-500 hover:bg-blue-100"
+              : variant === "success"
+                ? "border-green-500 text-green-500 hover:bg-green-100"
+                : variant === "warning"
+                  ? "border-yellow-500 text-yellow-500 hover:bg-yellow-100"
+                  : "border-red-500 text-red-500 hover:bg-red-100"
+          }`}
+        >
+          {buttonTitle}
+        </button>
+      </div>
+      <p>{children}</p>
+    </div>
   );
 };
 

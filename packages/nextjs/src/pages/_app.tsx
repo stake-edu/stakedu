@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Head from "next/head";
 import { WagmiProvider } from "wagmi";
 
-import "../css/customcss.css";
-import { getConfig, opencampus } from "../wagmi";
+import "../css/global.css";
+import { getConfig } from "../wagmi";
 
 const queryClient = new QueryClient();
 

@@ -4,8 +4,8 @@ import Modal from "./Modal";
 import UpdateStakeForm from "./UpdateStakeForm";
 
 interface StakeViewProps {
-  lpUnstaked: number;
-  lpStaked: number;
+  lpUnstaked: bigint | undefined;
+  lpStaked: bigint | undefined;
   handleSuccess: () => void;
   handleError: () => void;
 }
@@ -54,7 +54,7 @@ const StakeView: React.FC<StakeViewProps> = ({
                 ? lpUnstaked
                 : modalOpen === "unstake"
                   ? lpStaked
-                  : 0
+                  : undefined
             }
           />
         </Modal>

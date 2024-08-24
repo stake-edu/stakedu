@@ -1,86 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { formatEther, parseEther } from "viem";
+import { useAccount } from "wagmi";
 
-import { approve, getAllowance } from "../web3/cake_lp";
-import { endStake, startStake } from "../web3/stakes";
+import { ADDRESS_POOL, ADDRESS_TOKEN_STAKING } from "../consts";
+import {
+  useReadErc20Allowance,
+  useWriteErc20Approve,
+  useWriteStakingPoolDepositAndStartStake,
+  useWriteStakingRewardPoolEndStakeAndWithdraw,
+} from "../hooks/generated";
+import { format } from "../utilities";
 
 const UpdateStakeForm: React.FC<{
   formType: "stake" | "unstake";
-  balance: string;
+  balance: bigint | undefined;
   handleSuccess: (message: string) => void;
   handleError: (error: any, message: string) => void;
 }> = ({ formType, balance, handleSuccess, handleError }) => {
   const [amount, setAmount] = useState("");
-  const [validAmount, setValidAmount] = useState(false);
-  const [sufficientAllowance, setSufficientAllowance] = useState(false);
 
-  const setAmountPercentage = (perc: number) => {
-    const calculatedAmount = Math.floor(Number(balance) * perc) / 100;
-    const isValid = !isNaN(calculatedAmount) && calculatedAmount > 0;
-    setValidAmount(isValid);
-    setAmount(isNaN(calculatedAmount) ? "" : calculatedAmount.toString());
-  };
+  const account = useAccount();
 
-  const allowButtonPressed = async () => {
-    const numAmount = Number(amount);
-    await approve(numAmount);
-    const allowanceOk = await checkAllowance(numAmount);
-    setSufficientAllowance(allowanceOk);
-  };
+  const allowance = useReadErc20Allowance({
+    address: ADDRESS_TOKEN_STAKING,
+    args: [account.address!, ADDRESS_POOL],
+  });
+  const { writeContractAsync: approve } = useWriteErc20Approve();
 
-  const checkAllowance = async (amount: number): Promise<boolean> => {
-    try {
-      const allowance = await getAllowance();
-      return amount <= allowance;
-    } catch (error) {
-      console.error("Error checking allowance", error);
-      return false;
-    }
-  };
+  const { writeContractAsync: unstake } =
+    useWriteStakingRewardPoolEndStakeAndWithdraw();
 
-  const submitForm = () => {
-    if (formType === "stake") {
-      submitStake();
-    } else if (formType === "unstake") {
-      submitUnstake();
-    }
-  };
+  const { writeContractAsync: stake } =
+    useWriteStakingPoolDepositAndStartStake();
 
-  const submitStake = () => {
-    if (!sufficientAllowance) {
-      return;
-    }
-    if (!validAmount) {
-      return;
-    }
-    const value = Number(amount);
+  const isValid =
+    amount !== "" && balance !== undefined && parseEther(amount) <= balance;
 
-    startStake(value)
-      .then((result) => {
-        handleSuccess(`Stake increased. Transaction id: ${result.tx}`);
-      })
-      .catch((error) => {
-        console.log(">>> onSubmit startStake error:", error);
-        const message = getStakeError(error);
-        handleError(error, message);
-      });
-  };
-
-  const submitUnstake = () => {
-    if (!validAmount) {
-      return;
-    }
-    const value = Number(amount);
-
-    endStake(value)
-      .then((result) => {
-        handleSuccess(`Stake decreased. Transaction id: ${result.tx}`);
-      })
-      .catch((error) => {
-        console.log(">>> submitUnstake endStake error:", error);
-        const message = getStakeError(error);
-        handleError(error, message);
-      });
-  };
+  const isSufficientAllowance =
+    allowance?.data !== undefined && allowance?.data >= parseEther(amount);
 
   const getStakeError = (error: any): string => {
     switch (true) {
@@ -95,6 +52,50 @@ const UpdateStakeForm: React.FC<{
     }
   };
 
+  const submitForm = () => {
+    if (!isValid) {
+      return;
+    }
+
+    const value = parseEther(amount);
+
+    if (formType === "stake" && !isSufficientAllowance) {
+      return;
+    }
+
+    if (formType === "stake") {
+      stake({
+        address: ADDRESS_POOL,
+        args: [value],
+      })
+        .then((hash) => {
+          handleSuccess(`Stake increased. Transaction id: ${hash}`);
+        })
+        .catch((error) => {
+          console.log(">>> onSubmit startStake error:", error);
+          const message = getStakeError(error);
+          handleError(error, message);
+        });
+      return;
+    }
+
+    if (formType === "unstake") {
+      unstake({
+        address: ADDRESS_POOL,
+        args: [value],
+      })
+        .then((hash) => {
+          handleSuccess(`Stake decreased. Transaction id: ${hash}`);
+        })
+        .catch((error) => {
+          console.log(">>> submitUnstake endStake error:", error);
+          const message = getStakeError(error);
+          handleError(error, message);
+        });
+      return;
+    }
+  };
+
   const title = formType === "stake" ? "Stake" : "Unstake";
 
   return (
@@ -106,44 +107,54 @@ const UpdateStakeForm: React.FC<{
         <div className="flex justify-between mb-4">
           <span className="text-base">Balance:</span>
           <span className="text-base font-bold">
-            {balance} <span className="text-sm">EDU</span>
+            {format(balance)} <span className="text-sm">EDU</span>
           </span>
         </div>
         <div className="relative mb-4">
           <input
             type="text"
             className="w-full p-3 rounded-md bg-neutral-50 text-right"
-            value={amount + " EDU"}
-            readOnly
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
           />
         </div>
         <div className="grid grid-cols-4 gap-2 mb-6">
           {[25, 50, 75, 100].map((percentage) => (
             <button
               key={percentage}
-              onClick={() => setAmountPercentage(percentage)}
+              onClick={() =>
+                balance &&
+                setAmount(
+                  formatEther((balance * BigInt(percentage)) / BigInt(100)),
+                )
+              }
               className="border-2 border-purple-600 text-purple-600 rounded-md py-2"
             >
               {percentage === 100 ? "Max" : `${percentage}%`}
             </button>
           ))}
         </div>
-        <div className="text-center">
-          {validAmount && !sufficientAllowance && formType === "stake" && (
+        <div className="flex justify-center gap-x-2">
+          {!isSufficientAllowance && formType === "stake" && (
             <button
-              onClick={allowButtonPressed}
+              onClick={() => {
+                approve({
+                  address: ADDRESS_TOKEN_STAKING,
+                  args: [ADDRESS_POOL, parseEther(amount)],
+                });
+              }}
               className="bg-purple-600 text-white py-2 px-6 rounded-full"
             >
-              Allow LP token transfer
+              Approve
             </button>
           )}
           <button
             onClick={submitForm}
             disabled={
-              !(validAmount && (formType === "unstake" || sufficientAllowance))
+              !(isValid && (formType === "unstake" || isSufficientAllowance))
             }
             className={`bg-purple-600 text-white py-2 px-6 rounded-full ${
-              !(validAmount && (formType === "unstake" || sufficientAllowance))
+              !(isValid && (formType === "unstake" || isSufficientAllowance))
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}

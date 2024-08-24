@@ -1,104 +1,91 @@
-import React from "react";
-import { Button, Form, InputGroup } from "react-bootstrap";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import React, { useState } from "react";
 
 import { approve, getAllowance } from "../web3/etb";
 import { createRewardPeriod } from "../web3/reward_phases";
 
-export default class CreateRewardPhaseForm extends React.Component {
-  constructor(props) {
-    super(props);
+interface CreateRewardPhaseFormProps {
+  startDate?: number;
+  handleSuccess: (result: string) => void;
+  handleError: (error: Error | string, message?: string) => void;
+}
 
-    let day = 24 * 60 * 60;
-    let start =
-      (props.startDate && new Date((props.startDate + 1) * 1000)) || new Date();
-    let end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
+  startDate,
+  handleSuccess,
+  handleError,
+}) => {
+  const [sufficientAllowance, setSufficientAllowance] = useState(false);
+  const [validAmount, setValidAmount] = useState(false);
+  const [start, setStart] = useState<string>(
+    startDate
+      ? new Date((startDate + 1) * 1000).toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0],
+  );
+  const [end, setEnd] = useState<string>(
+    new Date(new Date(start).getTime() + 7 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
+  );
+  const [amount, setAmount] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-    this.state = {
-      sufficientAllowance: false,
-      validAmount: false,
-      startDate: start,
-      endDate: end,
-      amount: "",
-    };
-  }
+  const updateAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    const isValid = !isNaN(value) && value > 0;
 
-  updateAmount = (e) => {
-    let value = parseInt(e.target.value);
-    let isValid = !isNaN(value) && value > 0;
-
-    this.setState({
-      validAmount: isValid,
-      amount: e.target.value,
-    });
+    setValidAmount(isValid);
+    setAmount(e.target.value);
 
     if (isValid) {
-      this.checkAllowance(value).then((allowanceOk) => {
-        this.setState({ sufficientAllowance: allowanceOk });
-      });
+      checkAllowance(value).then(setSufficientAllowance);
     }
   };
 
-  updateDate = (fieldName, date) => {
-    const newState = {};
-    newState[fieldName] = date;
-    this.setState(newState);
+  const checkAllowance = async (amount: number): Promise<boolean> => {
+    try {
+      const allowance = await getAllowance();
+      return amount <= allowance;
+    } catch (error) {
+      console.error("Error checking allowance", error);
+      return false;
+    }
   };
 
-  allowButtonPressed = async () => {
-    const amount = parseInt(this.state.amount);
-    await approve(amount);
-
-    this.checkAllowance(amount).then((allowanceOk) => {
-      this.setState({ sufficientAllowance: allowanceOk });
-    });
-
-    this.props.allowanceUpdated();
+  const allowButtonPressed = async () => {
+    const amountValue = parseInt(amount);
+    await approve(amountValue);
+    const allowanceOk = await checkAllowance(amountValue);
+    setSufficientAllowance(allowanceOk);
   };
 
-  checkAllowance = (amount) => {
-    return new Promise((resolve, reject) => {
-      getAllowance()
-        .then((allowance, error) => {
-          const allowanceOk = parseInt(amount) <= allowance;
-          resolve(allowanceOk);
-        })
-        .catch((error) => {
-          console.error("Error checking allowance", error);
-          reject(error);
-        });
-    });
-  };
-
-  submitForm = () => {
-    const { amount, startDate, endDate, sufficientAllowance, validAmount } =
-      this.state;
-
+  const submitForm = async () => {
     if (!sufficientAllowance) {
-      this.setState({ error: "Insufficient token allowance" });
+      setError("Insufficient token allowance");
       return;
     }
     if (!validAmount) {
-      this.setState({ error: "Invalid tolen amount" });
+      setError("Invalid token amount");
       return;
     }
     const value = parseInt(amount);
 
-    createRewardPeriod(value, startDate, endDate)
-      .then((result) => {
-        this.props.handleSuccess(
-          `New reward phase created. Transaction id: ${result.tx}`,
-        );
-      })
-      .catch((error) => {
-        console.log("Error 2 createRewardPhase:", error);
-        const message = this.getRewardPeriodError(error);
-        this.props.handleError(error, message);
-      });
+    try {
+      const result = await createRewardPeriod(
+        value,
+        new Date(start),
+        new Date(end),
+      );
+      handleSuccess(`New reward phase created. Transaction id: ${result.tx}`);
+    } catch (error) {
+      console.error("Error creating reward phase:", error);
+      const message = getRewardPeriodError(error);
+      handleError(error, message);
+    }
   };
 
-  getRewardPeriodError = (error) => {
+  const getRewardPeriodError = (error: any): string => {
+    if (typeof error.message !== "string") return "Unknown error";
+
     switch (true) {
       case error.message.includes("Invalid period start time"):
         return "Invalid period start time";
@@ -111,98 +98,98 @@ export default class CreateRewardPhaseForm extends React.Component {
     }
   };
 
-  render() {
-    return (
-      <div className="p-2">
-        <h3>New Reward Phase</h3>
+  return (
+    <div className="p-4 bg-white rounded-lg shadow-md">
+      <h3 className="text-2xl font-bold mb-4">New Reward Phase</h3>
 
-        <Form>
-          <Form.Group className="mb-3" controlId="startDate">
-            <Form.Label>Start Date</Form.Label>
-            {/* <Form.Control type="email" placeholder="Enter email" /> */}
+      <form className="space-y-4">
+        <div>
+          <label
+            htmlFor="startDate"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Start Date
+          </label>
+          <input
+            type="date"
+            id="startDate"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          />
+          <p className="mt-1 text-sm text-gray-500">
+            The date the reward phase starts
+          </p>
+        </div>
 
-            <DatePicker
-              name="startDate"
-              className="form-control datepicker"
-              autoComplete="off"
-              onChange={(e) => this.updateDate("startDate", e)}
-              dateFormat="yyyy-MM-dd"
-              // value={this.state.startDate}
-              // dateFormat="dd-MM-yyyy"
-              // selected={this.state.startDate ? moment(this.state.startDate, 'DD-MM-YYYY') : moment()}
-              selected={
-                (this.state.startDate && new Date(this.state.startDate)) || null
-              }
+        <div>
+          <label
+            htmlFor="endDate"
+            className="block text-sm font-medium text-gray-700"
+          >
+            End Date
+          </label>
+          <input
+            type="date"
+            id="endDate"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          />
+          <p className="mt-1 text-sm text-gray-500">
+            The date the reward phase ends
+          </p>
+        </div>
+
+        <div>
+          <label
+            htmlFor="amount"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Amount
+          </label>
+          <div className="mt-1 relative rounded-md shadow-sm">
+            <input
+              type="text"
+              id="amount"
+              className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+              placeholder="0.0"
+              onChange={updateAmount}
             />
-
-            <Form.Text className="text-muted">
-              The date the reward phase start
-            </Form.Text>
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="endDate">
-            <Form.Label>End Date</Form.Label>
-            {/* <Form.Control type="email" placeholder="Enter email" /> */}
-            <DatePicker
-              name="endDate"
-              className="form-control datepicker"
-              autoComplete="off"
-              onChange={(e) => this.updateDate("endDate", e)}
-              dateFormat="yyyy-MM-dd"
-              // value={this.state.endDate}
-              // dateFormat="dd-MM-yyyy"
-              selected={
-                (this.state.endDate && new Date(this.state.endDate)) || null
-              }
-            />
-
-            <Form.Text className="text-muted">
-              The date the reward phase end
-            </Form.Text>
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="rewardAmountt">
-            <Form.Label>Amount</Form.Label>
-            <InputGroup className="mb-3">
-              <Form.Control
-                style={{ maxWidth: 200 }}
-                type="text"
-                placeholder="0.0"
-                autoComplete="off"
-                title="Amount"
-                onChange={(e) => this.updateAmount(e)}
-              />
-              <InputGroup.Text> ETB </InputGroup.Text>
-            </InputGroup>
-          </Form.Group>
-
-          <div style={{ textAlign: "center" }} className="pt-2">
-            {this.state.validAmount && !this.state.sufficientAllowance && (
-              <Button
-                name="allow"
-                type="button"
-                variant="outline-primary"
-                onClick={(e) => this.allowButtonPressed()}
-                className="pl-2"
-              >
-                Allow ETB token transfer
-              </Button>
-            )}
-            &nbsp;&nbsp;&nbsp;
-            {
-              <Button
-                variant="outline-primary"
-                onClick={this.submitForm}
-                disabled={
-                  !(this.state.validAmount && this.state.sufficientAllowance)
-                }
-              >
-                Submit
-              </Button>
-            }
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <span className="text-gray-500 sm:text-sm">ETB</span>
+            </div>
           </div>
-        </Form>
-      </div>
-    );
-  }
-}
+        </div>
+
+        <div className="flex justify-center space-x-4">
+          {validAmount && !sufficientAllowance && (
+            <button
+              type="button"
+              onClick={allowButtonPressed}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Allow ETB token transfer
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={submitForm}
+            disabled={!(validAmount && sufficientAllowance)}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+
+      {error && (
+        <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CreateRewardPhaseForm;

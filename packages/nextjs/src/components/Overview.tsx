@@ -1,10 +1,8 @@
-import { use } from "react";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount } from "wagmi";
 
+import { ADDRESS_POOL } from "../consts";
 import {
-  useReadStakingPoolGetBalance,
   useReadStakingPoolGetStakedBalance,
-  useReadStakingRewardPoolGetBalance,
   useReadStakingRewardPoolGetCurrentRewardPeriodId,
   useReadStakingRewardPoolGetRewardsStats,
   useReadStakingRewardPoolRewardPeriods,
@@ -15,25 +13,25 @@ export default () => {
   const account = useAccount();
 
   const id = useReadStakingRewardPoolGetCurrentRewardPeriodId({
-    address: "0xc819E7ecbF6C1Fc0e2ADA9dd33da55Cd76918aeE",
+    address: ADDRESS_POOL,
   });
   const period = useReadStakingRewardPoolRewardPeriods({
-    address: "0xc819E7ecbF6C1Fc0e2ADA9dd33da55Cd76918aeE",
+    address: ADDRESS_POOL,
     args: [id?.data && id.data - BigInt(1)],
   });
 
   const staked = useReadStakingPoolGetStakedBalance({
-    address: "0xc819E7ecbF6C1Fc0e2ADA9dd33da55Cd76918aeE",
+    address: ADDRESS_POOL,
     account: account.address,
   });
 
   const reward = useReadStakingRewardPoolGetRewardsStats({
-    address: "0xc819E7ecbF6C1Fc0e2ADA9dd33da55Cd76918aeE",
+    address: ADDRESS_POOL,
     account: account.address,
   });
 
   const share =
-    staked?.data && period?.data?.totalStaked > 0
+    staked?.data && period?.data && period?.data?.totalStaked > 0
       ? Math.round(
           Number((staked?.data * BigInt(100)) / period?.data?.totalStaked),
         )
