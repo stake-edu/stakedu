@@ -1,132 +1,88 @@
-import React from "react";
-import {
-  Button,
-  ButtonGroup,
-  ButtonToolbar,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-} from "react-bootstrap";
+import React, { useEffect, useState } from "react";
 
-import { Center } from "./Layout";
 import { approve, getAllowance } from "../web3/cake_lp";
 import { endStake, startStake } from "../web3/stakes";
 
-export default class UpdateStakeForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      ...props,
-      amount: "",
-    };
-  }
+const UpdateStakeForm: React.FC<{
+  formType: "stake" | "unstake";
+  balance: string;
+  handleSuccess: (message: string) => void;
+  handleError: (error: any, message: string) => void;
+}> = ({ formType, balance, handleSuccess, handleError }) => {
+  const [amount, setAmount] = useState("");
+  const [validAmount, setValidAmount] = useState(false);
+  const [sufficientAllowance, setSufficientAllowance] = useState(false);
 
-  setAmount = (perc) => {
-    const amount = Math.floor(Number(this.state.balance) * perc) / 100;
-    let isValid = !isNaN(amount) && amount > 0;
-    this.setState({
-      validAmount: isValid,
-      amount: isNaN(amount) ? "" : amount.toString(),
-    });
+  const setAmountPercentage = (perc: number) => {
+    const calculatedAmount = Math.floor(Number(balance) * perc) / 100;
+    const isValid = !isNaN(calculatedAmount) && calculatedAmount > 0;
+    setValidAmount(isValid);
+    setAmount(isNaN(calculatedAmount) ? "" : calculatedAmount.toString());
   };
 
-  updateAmount = (e) => {
-    let value = this.parseAmount(e.target.value);
-    let isValid = !isNaN(value) && value >= 0;
+  const allowButtonPressed = async () => {
+    const numAmount = Number(amount);
+    await approve(numAmount);
+    const allowanceOk = await checkAllowance(numAmount);
+    setSufficientAllowance(allowanceOk);
+  };
 
-    this.setState({
-      validAmount: isValid,
-      amount: e.target.value,
-    });
-
-    if (isValid) {
-      this.checkAllowance(value).then((allowanceOk) => {
-        this.setState({ sufficientAllowance: allowanceOk });
-      });
+  const checkAllowance = async (amount: number): Promise<boolean> => {
+    try {
+      const allowance = await getAllowance();
+      return amount <= allowance;
+    } catch (error) {
+      console.error("Error checking allowance", error);
+      return false;
     }
   };
 
-  allowButtonPressed = async () => {
-    const amount = Number(this.state.amount);
-    await approve(amount).then((result) => {
-      this.checkAllowance(amount).then((allowanceOk) => {
-        this.setState({ sufficientAllowance: allowanceOk });
-      });
-    });
-  };
-
-  checkAllowance = (amount) => {
-    return new Promise((resolve, reject) => {
-      getAllowance()
-        .then((allowance) => {
-          const allowanceOk = amount <= allowance;
-          resolve(allowanceOk);
-        })
-        .catch((error) => {
-          console.error("Error checking allowance", error);
-          reject(error);
-        });
-    });
-  };
-
-  submitForm = () => {
-    if (this.state.formType === "stake") {
-      this.submitStake();
-    } else if (this.state.formType === "unstake") {
-      this.submitUnstake();
+  const submitForm = () => {
+    if (formType === "stake") {
+      submitStake();
+    } else if (formType === "unstake") {
+      submitUnstake();
     }
   };
 
-  submitStake = () => {
-    const { amount, sufficientAllowance, validAmount } = this.state;
-
+  const submitStake = () => {
     if (!sufficientAllowance) {
-      this.setState({ error: "Insufficient token allowance" });
       return;
     }
     if (!validAmount) {
-      this.setState({ error: "Invalid tolen amount" });
       return;
     }
     const value = Number(amount);
 
     startStake(value)
       .then((result) => {
-        this.props.handleSuccess(
-          `Stake increased. Transaction id: ${result.tx}`,
-        );
+        handleSuccess(`Stake increased. Transaction id: ${result.tx}`);
       })
       .catch((error) => {
         console.log(">>> onSubmit startStake error:", error);
-        const message = this.getStakeError(error);
-        this.props.handleError(error, message);
+        const message = getStakeError(error);
+        handleError(error, message);
       });
   };
 
-  submitUnstake = () => {
-    const { amount, validAmount } = this.state;
+  const submitUnstake = () => {
     if (!validAmount) {
-      this.setState({ error: "Invalid tolen amount" });
       return;
     }
     const value = Number(amount);
 
     endStake(value)
       .then((result) => {
-        this.props.handleSuccess(
-          `Stake decreased. Transaction id: ${result.tx}`,
-        );
+        handleSuccess(`Stake decreased. Transaction id: ${result.tx}`);
       })
       .catch((error) => {
         console.log(">>> submitUnstake endStake error:", error);
-        const message = this.getStakeError(error);
-        this.props.handleError(error, message);
+        const message = getStakeError(error);
+        handleError(error, message);
       });
   };
 
-  getStakeError = (error) => {
+  const getStakeError = (error: any): string => {
     switch (true) {
       case error.message.includes("No active reward phase found"):
         return "No active reward phase found";
@@ -139,124 +95,65 @@ export default class UpdateStakeForm extends React.Component {
     }
   };
 
-  parseAmount = (amount) => {
-    return Math.floor(Number(amount) * 100) / 100;
-  };
+  const title = formType === "stake" ? "Stake" : "Unstake";
 
-  render() {
-    const { formType, balance } = this.state;
-
-    const title =
-      formType === "stake"
-        ? "Stake"
-        : formType === "unstake"
-          ? "Unstake"
-          : undefined;
-    if (!title) return <div>Error</div>;
-
-    return (
-      <div>
-        <h3 className="text-center">{title}</h3>
-
-        <Form className="p-4">
-          <Form.Group row controlId="stakeAmount">
-            <Form.Label
-              variant="secondary"
-              className="w-100 text-end text-muted"
+  return (
+    <>
+      <div className="w-[400px] shadow-lg bg-purple-100 rounded-lg p-6">
+        <h1 className="text-center font-title text-lg font-bold mb-6">
+          {title}
+        </h1>
+        <div className="flex justify-between mb-4">
+          <span className="text-base">Balance:</span>
+          <span className="text-base font-bold">
+            {balance} <span className="text-sm">EDU</span>
+          </span>
+        </div>
+        <div className="relative mb-4">
+          <input
+            type="text"
+            className="w-full p-3 rounded-md bg-neutral-50 text-right"
+            value={amount + " EDU"}
+            readOnly
+          />
+        </div>
+        <div className="grid grid-cols-4 gap-2 mb-6">
+          {[25, 50, 75, 100].map((percentage) => (
+            <button
+              key={percentage}
+              onClick={() => setAmountPercentage(percentage)}
+              className="border-2 border-purple-600 text-purple-600 rounded-md py-2"
             >
-              Balance: {balance}
-            </Form.Label>
-            <InputGroup className="mb-3">
-              <Form.Control
-                type="text"
-                placeholder="0.0"
-                autoComplete="off"
-                value={this.state.amount}
-                title="balance not staked"
-                onChange={(e) => this.updateAmount(e)}
-              />
-              <InputGroup.Text> Cake-LP </InputGroup.Text>
-            </InputGroup>
-          </Form.Group>
-
-          <Container>
-            <Row>
-              <Col className="m-0 p-2">
-                {" "}
-                <Button
-                  onClick={() => this.setAmount(25)}
-                  className="w-100"
-                  variant="outline-secondary"
-                >
-                  25%
-                </Button>{" "}
-              </Col>
-              <Col className="m-0 p-2">
-                {" "}
-                <Button
-                  onClick={() => this.setAmount(50)}
-                  className="w-100"
-                  variant="outline-secondary"
-                >
-                  50%
-                </Button>{" "}
-              </Col>
-              <Col className="m-0 p-2">
-                {" "}
-                <Button
-                  onClick={() => this.setAmount(75)}
-                  className="w-100"
-                  variant="outline-secondary"
-                >
-                  75%
-                </Button>{" "}
-              </Col>
-              <Col className="m-0 p-2">
-                {" "}
-                <Button
-                  onClick={() => this.setAmount(100)}
-                  className="w-100"
-                  variant="outline-secondary"
-                >
-                  Max
-                </Button>{" "}
-              </Col>
-            </Row>
-          </Container>
-
-          <div style={{ textAlign: "center" }} className="mt-4">
-            {this.state.validAmount &&
-              !this.state.sufficientAllowance &&
-              this.state.formType === "stake" && (
-                <Button
-                  name="allow"
-                  type="button"
-                  variant="primary w-50"
-                  onClick={(e) => this.allowButtonPressed()}
-                  className="pl-2"
-                >
-                  Allow LP token transfer
-                </Button>
-              )}
-            &nbsp;&nbsp;&nbsp;
-            {
-              <Button
-                variant="primary w-25"
-                onClick={this.submitForm}
-                disabled={
-                  !(
-                    this.state.validAmount &&
-                    (this.state.formType === "unstake" ||
-                      this.state.sufficientAllowance)
-                  )
-                }
-              >
-                {title}
-              </Button>
+              {percentage === 100 ? "Max" : `${percentage}%`}
+            </button>
+          ))}
+        </div>
+        <div className="text-center">
+          {validAmount && !sufficientAllowance && formType === "stake" && (
+            <button
+              onClick={allowButtonPressed}
+              className="bg-purple-600 text-white py-2 px-6 rounded-full"
+            >
+              Allow LP token transfer
+            </button>
+          )}
+          <button
+            onClick={submitForm}
+            disabled={
+              !(validAmount && (formType === "unstake" || sufficientAllowance))
             }
-          </div>
-        </Form>
+            className={`bg-purple-600 text-white py-2 px-6 rounded-full ${
+              !(validAmount && (formType === "unstake" || sufficientAllowance))
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+          >
+            {title}
+          </button>
+        </div>
       </div>
-    );
-  }
-}
+    </>
+  );
+};
+
+export default UpdateStakeForm;

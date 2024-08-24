@@ -35,16 +35,12 @@ export const Wrapped = ({ children, style, maxWidth }) => (
   </div>
 );
 
-export const Center = ({ children, style, maxWidth }) => (
-  <div style={style}>
+export const Center = ({ children, style, maxWidth = 1000 }) => (
+  <div 
+    className={`mx-auto p-0 ${maxWidth ? `max-w-[${maxWidth}px]` : 'max-w-[1000px]'}`}
+    style={style}
+  >
     {children}
-    <style jsx>{`
-      div {
-        max-width: ${maxWidth ? maxWidth : 1000}px;
-        margin: 0 auto;
-        padding: 0px;
-      }
-    `}</style>
   </div>
 );
 

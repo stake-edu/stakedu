@@ -9,6 +9,7 @@ export const getStakedBalance = async () => {
   const cakeLP = await getInstance(CakeLP);
   const pool = await getInstance(StakingRewardPool);
   const response = await pool.getStakedBalance.call({ from: account });
+  console.log("getStakedBalance: ", pool.address, response);
   const staked = await toNumber(cakeLP, response, 4);
 
   return staked;

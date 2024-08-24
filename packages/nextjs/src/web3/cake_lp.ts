@@ -6,6 +6,7 @@ import { getAccount, toNumber } from "./utils";
 
 export const getBalance = async () => {
   const cakeLP = await getInstance(CakeLP);
+  console.log("CAKE LP: ", cakeLP.address);
   const account = await getAccount();
   const balance = await cakeLP.balanceOf.call(account);
 

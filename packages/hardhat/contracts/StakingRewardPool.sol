@@ -42,8 +42,12 @@ contract StakingRewardPool is StakingPool {
     }
 
     IERC20 internal rewardToken;
-    RewardPeriod[] public rewardPeriods;
+    RewardPeriod[] _rewardPeriods;
     uint rewardPeriodsCount = 0;
+
+    function rewardPeriods(uint index) public view returns (RewardPeriod memory) {
+        return _rewardPeriods[index];
+    }
 
     mapping(address => UserInfo) userInfos;
 
@@ -63,13 +67,13 @@ contract StakingRewardPool is StakingPool {
         require(reward > 0, "Invalid reward period amount");
         require(to > from && to > block.timestamp, "Invalid reward period interval");
         require(
-            rewardPeriods.length == 0 || from > rewardPeriods[rewardPeriods.length - 1].to,
+            _rewardPeriods.length == 0 || from > _rewardPeriods[_rewardPeriods.length - 1].to,
             "Invalid period start time"
         );
 
-        rewardPeriods.push(
+        _rewardPeriods.push(
             RewardPeriod({
-                id: rewardPeriods.length + 1,
+                id: _rewardPeriods.length + 1,
                 reward: reward,
                 from: from,
                 to: to,
@@ -79,7 +83,7 @@ contract StakingRewardPool is StakingPool {
                 totalRewardsPaid: 0
             })
         );
-        rewardPeriodsCount = rewardPeriods.length;
+        rewardPeriodsCount = _rewardPeriods.length;
         depositReward(reward);
     }
 
@@ -88,12 +92,12 @@ contract StakingRewardPool is StakingPool {
     }
 
     function deleteRewardPeriod(uint index) public onlyOwner {
-        require(rewardPeriods.length > index, "Invalid reward phase index");
-        for (uint i = index; i < rewardPeriods.length - 1; i++) {
-            rewardPeriods[i] = rewardPeriods[i + 1];
+        require(_rewardPeriods.length > index, "Invalid reward phase index");
+        for (uint i = index; i < _rewardPeriods.length - 1; i++) {
+            _rewardPeriods[i] = _rewardPeriods[i + 1];
         }
-        rewardPeriods.pop();
-        rewardPeriodsCount = rewardPeriods.length;
+        _rewardPeriods.pop();
+        rewardPeriodsCount = _rewardPeriods.length;
     }
 
     function rewardBalance() public view returns (uint) {
@@ -113,7 +117,7 @@ contract StakingRewardPool is StakingPool {
         super.startStake(amount);
 
         // update total tokens staked
-        RewardPeriod storage period = rewardPeriods[periodId - 1];
+        RewardPeriod storage period = _rewardPeriods[periodId - 1];
         period.totalStaked += amount;
     }
 
@@ -123,7 +127,7 @@ contract StakingRewardPool is StakingPool {
 
         // update total tokens staked
         uint periodId = getCurrentRewardPeriodId();
-        RewardPeriod storage period = rewardPeriods[periodId - 1];
+        RewardPeriod storage period = _rewardPeriods[periodId - 1];
         period.totalStaked -= amount;
 
         claim();
@@ -133,7 +137,7 @@ contract StakingRewardPool is StakingPool {
         uint periodId = getCurrentRewardPeriodId();
         if (periodId == 0) return 0;
 
-        RewardPeriod memory period = rewardPeriods[periodId - 1];
+        RewardPeriod memory period = _rewardPeriods[periodId - 1];
         uint newRewardDistribution = calculateRewardDistribution(period);
         uint reward = calculateReward(newRewardDistribution);
 
@@ -155,7 +159,7 @@ contract StakingRewardPool is StakingPool {
             userInfo.pendingRewards = 0;
 
             uint periodId = getCurrentRewardPeriodId();
-            RewardPeriod storage period = rewardPeriods[periodId - 1];
+            RewardPeriod storage period = _rewardPeriods[periodId - 1];
             period.totalRewardsPaid += rewards;
 
             payReward(msg.sender, rewards);
@@ -164,8 +168,8 @@ contract StakingRewardPool is StakingPool {
 
     function getCurrentRewardPeriodId() public view returns (uint) {
         if (rewardPeriodsCount == 0) return 0;
-        for (uint i = rewardPeriods.length; i > 0; i--) {
-            RewardPeriod memory period = rewardPeriods[i - 1];
+        for (uint i = _rewardPeriods.length; i > 0; i--) {
+            RewardPeriod memory period = _rewardPeriods[i - 1];
             if (period.from <= block.timestamp && period.to >= block.timestamp) {
                 return period.id;
             }
@@ -190,7 +194,7 @@ contract StakingRewardPool is StakingPool {
         // reward period stats
         uint periodId = getCurrentRewardPeriodId();
         if (periodId > 0) {
-            RewardPeriod memory period = rewardPeriods[periodId - 1];
+            RewardPeriod memory period = _rewardPeriods[periodId - 1];
             stats.rewardRate = rewardRate(period);
             stats.totalRewardsPaid = period.totalRewardsPaid;
         }
@@ -217,7 +221,7 @@ contract StakingRewardPool is StakingPool {
         uint periodId = getCurrentRewardPeriodId();
         require(periodId > 0, "No active reward period found");
 
-        RewardPeriod storage period = rewardPeriods[periodId - 1];
+        RewardPeriod storage period = _rewardPeriods[periodId - 1];
         uint rewardDistribuedPerToken = calculateRewardDistribution(period);
 
         // update pending rewards reward since rewardPerTokenStaked was updated

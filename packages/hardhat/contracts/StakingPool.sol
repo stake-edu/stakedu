@@ -50,6 +50,7 @@ contract StakingPool is Wallet {
         emit UnStaked(msg.sender, amount);
     }
 
+    // TODO:- take in account rather than msg.sender
     function getStakedBalance() public view returns (uint) {
         return stakes[msg.sender];
     }

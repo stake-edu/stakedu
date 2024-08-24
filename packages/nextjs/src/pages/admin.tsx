@@ -4,7 +4,6 @@ import { Alert, Button, Table } from "react-bootstrap";
 import { AlertDismissible } from "../components/AlertDismissible";
 import CreateRewardPhaseForm from "../components/CreateRewardPhaseForm";
 import Header from "../components/Header";
-import { Center, Page } from "../components/Layout";
 import Modal from "../components/Modal";
 import RewardPhaseInfo from "../components/RewardPhaseInfo";
 import { getRewardPeriods } from "../web3/reward_phases";
@@ -98,7 +97,7 @@ export default class AdminPage extends React.Component {
 
     if (!accountConnected)
       return (
-        <Page>
+        <>
           <Header
             ref={this.headerRef}
             reload={() => this.reload()}
@@ -106,7 +105,7 @@ export default class AdminPage extends React.Component {
               this.setAccountConnected(connected)
             }
           />
-          <Center>
+          <div className={"mx-auto p-0 max-w-[1000px]"}>
             <Alert
               variant="info"
               title="No Ethereum account connected"
@@ -114,8 +113,8 @@ export default class AdminPage extends React.Component {
             >
               Please connect an Ethereum account to access this dapp!
             </Alert>
-          </Center>
-        </Page>
+          </div>
+        </>
       );
 
     const rewardPeriodsRows =
@@ -130,7 +129,7 @@ export default class AdminPage extends React.Component {
       this.state.rewardPeriods[0];
 
     return (
-      <Page>
+      <>
         <Header
           ref={this.headerRef}
           reload={() => this.reload()}
@@ -150,7 +149,7 @@ export default class AdminPage extends React.Component {
           </Modal>
         )}
 
-        <Center>
+        <div className={"mx-auto p-0 max-w-[1000px]"}>
           {this.state.error && (
             <AlertDismissible variant="danger" title="Error">
               {" "}
@@ -162,15 +161,15 @@ export default class AdminPage extends React.Component {
               {this.state.info.detail}
             </AlertDismissible>
           )}
-        </Center>
+        </div>
 
         {rewardPeriodsRows && rewardPeriodsRows.length == 0 && (
-          <Center className="mt-2">
+          <div className="mx-auto p-0 max-w-[1000px] mt-2">
             <Alert variant="info"> No reward phase configured</Alert>
-          </Center>
+          </div>
         )}
         {rewardPeriodsRows && rewardPeriodsRows.length > 0 && (
-          <Center>
+          <div className="mx-auto p-0 max-w-[1000px]">
             <Table responsive bordered striped="on">
               <thead>
                 <tr>
@@ -184,7 +183,7 @@ export default class AdminPage extends React.Component {
               </thead>
               <tbody>{rewardPeriodsRows}</tbody>
             </Table>
-          </Center>
+          </div>
         )}
 
         <div style={{ textAlign: "center" }}>
@@ -192,7 +191,7 @@ export default class AdminPage extends React.Component {
             Create New Reward Phase
           </Button>
         </div>
-      </Page>
+      </>
     );
   }
 }

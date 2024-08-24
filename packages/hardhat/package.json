@@ -17,11 +17,13 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "5.0.0",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
+    "@wagmi/cli": "^2.1.15",
     "hardhat": "2.22.9",
     "hardhat-deploy": "0.12.4",
     "hardhat-deploy-ethers": "0.4.2",
     "prettier": "3.3.3",
     "prettier-plugin-solidity": "1.4.0",
-    "typescript": "5.5.4"
+    "typescript": "5.5.4",
+    "viem": "^2.20.0"
   }
 }
