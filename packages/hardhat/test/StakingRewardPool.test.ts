@@ -78,7 +78,6 @@ describe("StakingRewardPool", () => {
 
     await rewardToken.approve(pool.target, periodReward);
 
-    // let latestBlock = await web3.eth.getBlock("latest");
     let start = BigInt(await time.latest());
     let end = start + period;
 

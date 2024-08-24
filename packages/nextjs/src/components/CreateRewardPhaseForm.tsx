@@ -1,7 +1,13 @@
 import React, { useState } from "react";
+import { parseEther } from "viem";
+import { useAccount } from "wagmi";
 
-import { approve, getAllowance } from "../web3/etb";
-import { createRewardPeriod } from "../web3/reward_phases";
+import { ADDRESS_POOL, ADDRESS_TOKEN_REWARD } from "../consts";
+import {
+  useReadErc20Allowance,
+  useWriteErc20Approve,
+  useWriteStakingRewardPoolNewRewardPeriod,
+} from "../hooks/generated";
 
 interface CreateRewardPhaseFormProps {
   startDate?: number;
@@ -14,8 +20,8 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
   handleSuccess,
   handleError,
 }) => {
-  const [sufficientAllowance, setSufficientAllowance] = useState(false);
-  const [validAmount, setValidAmount] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [start, setStart] = useState<string>(
     startDate
       ? new Date((startDate + 1) * 1000).toISOString().split("T")[0]
@@ -26,62 +32,19 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
       .toISOString()
       .split("T")[0],
   );
-  const [amount, setAmount] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
-  const updateAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    const isValid = !isNaN(value) && value > 0;
+  const account = useAccount();
+  const allowance = useReadErc20Allowance({
+    address: ADDRESS_TOKEN_REWARD,
+    args: [account.address!, ADDRESS_POOL],
+  });
+  const { writeContractAsync: approve } = useWriteErc20Approve();
+  const { writeContractAsync: createRewardPeriod } =
+    useWriteStakingRewardPoolNewRewardPeriod();
 
-    setValidAmount(isValid);
-    setAmount(e.target.value);
-
-    if (isValid) {
-      checkAllowance(value).then(setSufficientAllowance);
-    }
-  };
-
-  const checkAllowance = async (amount: number): Promise<boolean> => {
-    try {
-      const allowance = await getAllowance();
-      return amount <= allowance;
-    } catch (error) {
-      console.error("Error checking allowance", error);
-      return false;
-    }
-  };
-
-  const allowButtonPressed = async () => {
-    const amountValue = parseInt(amount);
-    await approve(amountValue);
-    const allowanceOk = await checkAllowance(amountValue);
-    setSufficientAllowance(allowanceOk);
-  };
-
-  const submitForm = async () => {
-    if (!sufficientAllowance) {
-      setError("Insufficient token allowance");
-      return;
-    }
-    if (!validAmount) {
-      setError("Invalid token amount");
-      return;
-    }
-    const value = parseInt(amount);
-
-    try {
-      const result = await createRewardPeriod(
-        value,
-        new Date(start),
-        new Date(end),
-      );
-      handleSuccess(`New reward phase created. Transaction id: ${result.tx}`);
-    } catch (error) {
-      console.error("Error creating reward phase:", error);
-      const message = getRewardPeriodError(error);
-      handleError(error, message);
-    }
-  };
+  const isValidAmount = parseEther(amount) > BigInt(0);
+  const isSufficientAllowance =
+    allowance?.data !== undefined && allowance?.data >= parseEther(amount);
 
   const getRewardPeriodError = (error: any): string => {
     if (typeof error.message !== "string") return "Unknown error";
@@ -96,6 +59,34 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
       default:
         return error.message;
     }
+  };
+
+  const submitForm = () => {
+    if (!isSufficientAllowance) {
+      setError("Insufficient token allowance");
+      return;
+    }
+    if (!isValidAmount) {
+      setError("Invalid token amount");
+      return;
+    }
+
+    createRewardPeriod({
+      address: ADDRESS_POOL,
+      args: [
+        parseEther(amount),
+        BigInt(Math.round(new Date(start).getTime() / 1000)),
+        BigInt(Math.round(new Date(end).getTime() / 1000)),
+      ],
+    })
+      .then((hash) => {
+        handleSuccess(`New reward phase created. Transaction id: ${hash}`);
+      })
+      .catch((error) => {
+        console.error("Error creating reward phase:", error);
+        const message = getRewardPeriodError(error);
+        handleError(error, message);
+      });
   };
 
   return (
@@ -154,7 +145,7 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
               id="amount"
               className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
               placeholder="0.0"
-              onChange={updateAmount}
+              onChange={(e) => setAmount(e.target.value)}
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               <span className="text-gray-500 sm:text-sm">ETB</span>
@@ -163,19 +154,24 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
         </div>
 
         <div className="flex justify-center space-x-4">
-          {validAmount && !sufficientAllowance && (
+          {isValidAmount && !isSufficientAllowance && (
             <button
               type="button"
-              onClick={allowButtonPressed}
+              onClick={() => {
+                approve({
+                  address: ADDRESS_TOKEN_REWARD,
+                  args: [ADDRESS_POOL, parseEther(amount)],
+                });
+              }}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Allow ETB token transfer
+              Approve
             </button>
           )}
           <button
             type="button"
             onClick={submitForm}
-            disabled={!(validAmount && sufficientAllowance)}
+            disabled={!(isValidAmount && isSufficientAllowance)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Submit

@@ -14,7 +14,7 @@ contract Wallet is Ownable {
     // Token balances
     mapping(address => uint256) public balances;
 
-    // users that deposited CakeLP tokens into their balances
+    // users that deposited tokens into their balances
     address[] internal usersArray;
     mapping(address => bool) internal users;
 
