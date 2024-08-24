@@ -34,7 +34,7 @@ const AdminPage: React.FC = () => {
     <>
       <Header />
 
-      <div className="mx-auto p-0 max-w-[1000px]">
+      <div className="mx-auto max-w-[1000px] p-0">
         {error && (
           <AlertDismissible variant="error" title="Error">
             {error}
@@ -51,7 +51,7 @@ const AdminPage: React.FC = () => {
 
       <div className="text-center">
         <button
-          className="bg-purple-600 text-white py-2 px-6 rounded-full"
+          className="rounded-full bg-purple-600 px-6 py-2 text-white"
           onClick={() => setModalOpen(true)}
         >
           Create New Reward Phase

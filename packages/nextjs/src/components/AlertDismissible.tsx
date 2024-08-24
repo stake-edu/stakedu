@@ -30,11 +30,11 @@ export const AlertDismissible: React.FC<AlertDismissibleProps> = ({
 
   return (
     <div className={`border-l-4 p-4 ${variantStyles[variant]}`}>
-      <div className="flex justify-between items-center mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <h3 className="font-bold">{title}</h3>
         <button
           onClick={handleButtonAction}
-          className={`px-4 py-2 rounded text-sm font-medium border ${
+          className={`rounded border px-4 py-2 text-sm font-medium ${
             variant === "info"
               ? "border-blue-500 text-blue-500 hover:bg-blue-100"
               : variant === "success"

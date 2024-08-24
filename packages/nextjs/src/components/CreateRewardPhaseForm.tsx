@@ -90,8 +90,8 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h3 className="text-2xl font-bold mb-4">New Reward Phase</h3>
+    <div className="rounded-lg bg-white p-4 shadow-md">
+      <h3 className="mb-4 text-2xl font-bold">New Reward Phase</h3>
 
       <form className="space-y-4">
         <div>
@@ -139,15 +139,15 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
           >
             Amount
           </label>
-          <div className="mt-1 relative rounded-md shadow-sm">
+          <div className="relative mt-1 rounded-md shadow-sm">
             <input
               type="text"
               id="amount"
-              className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+              className="block w-full rounded-md border-gray-300 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               placeholder="0.0"
               onChange={(e) => setAmount(e.target.value)}
             />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
               <span className="text-gray-500 sm:text-sm">ETB</span>
             </div>
           </div>
@@ -163,7 +163,7 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
                   args: [ADDRESS_POOL, parseEther(amount)],
                 });
               }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               Approve
             </button>
@@ -172,7 +172,7 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
             type="button"
             onClick={submitForm}
             disabled={!(isValidAmount && isSufficientAllowance)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Submit
           </button>
@@ -180,7 +180,7 @@ const CreateRewardPhaseForm: React.FC<CreateRewardPhaseFormProps> = ({
       </form>
 
       {error && (
-        <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mt-4 rounded border border-red-400 bg-red-100 p-2 text-red-700">
           {error}
         </div>
       )}

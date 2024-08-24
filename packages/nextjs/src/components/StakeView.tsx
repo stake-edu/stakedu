@@ -6,8 +6,8 @@ import UpdateStakeForm from "./UpdateStakeForm";
 interface StakeViewProps {
   lpUnstaked: bigint | undefined;
   lpStaked: bigint | undefined;
-  handleSuccess: () => void;
-  handleError: () => void;
+  handleSuccess: (message: string) => void;
+  handleError: (error: Error, message?: string) => void;
 }
 
 const StakeView: React.FC<StakeViewProps> = ({
@@ -22,16 +22,16 @@ const StakeView: React.FC<StakeViewProps> = ({
 
   return (
     <>
-      <div className="flex space-x-4 justify-center">
+      <div className="flex justify-between space-x-4">
         <button
-          className="bg-purple-600 text-white py-2 px-4 rounded-md"
+          className="w-2/4 rounded-md bg-purple-600 px-4 py-2 font-semibold text-white"
           onClick={() => setModalOpen("stake")}
         >
           Stake
         </button>
         <button
+          className="w-2/4 rounded-md border-2 border-purple-600 bg-purple-50 px-4 py-2 font-semibold text-purple-600"
           onClick={() => setModalOpen("unstake")}
-          className="border-2 border-purple-600 text-purple-600 py-2 px-4 rounded-md"
         >
           Unstake
         </button>
@@ -41,13 +41,13 @@ const StakeView: React.FC<StakeViewProps> = ({
         <Modal onClose={() => setModalOpen(undefined)}>
           <UpdateStakeForm
             formType={modalOpen}
-            handleSuccess={() => {
+            handleSuccess={(message: string) => {
               setModalOpen(undefined);
-              handleSuccess();
+              handleSuccess(message);
             }}
-            handleError={() => {
+            handleError={(error: Error, message?: string) => {
               setModalOpen(undefined);
-              handleError();
+              handleError(error, message);
             }}
             balance={
               modalOpen === "stake"

@@ -24,7 +24,6 @@ const RewardPhaseTable = () => {
     address: ADDRESS_POOL,
   });
 
-
   useEffect(() => {
     if (count?.data === undefined) {
       return;
@@ -33,11 +32,11 @@ const RewardPhaseTable = () => {
     Promise.all(
       Array(Number(count.data))
         .fill(undefined)
-        .map(async (_, i) => 
+        .map(async (_, i) =>
           readStakingRewardPoolRewardPeriods(config, {
             address: ADDRESS_POOL,
-            args: [i],
-          })
+            args: [BigInt(i)],
+          }),
         ),
     ).then(setRewardPeriods);
   }, [count?.data]);
@@ -45,26 +44,26 @@ const RewardPhaseTable = () => {
   return (
     <>
       {rewardPeriods.length === 0 ? (
-        <div className="mx-auto p-0 max-w-[1000px] mt-2">
+        <div className="mx-auto mt-2 max-w-[1000px] p-0">
           <div
-            className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4"
+            className="border-l-4 border-blue-500 bg-blue-100 p-4 text-blue-700"
             role="alert"
           >
             No reward phase configured
           </div>
         </div>
       ) : (
-        <div className="mx-auto p-0 max-w-[1000px]">
+        <div className="mx-auto max-w-[1000px] p-0">
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300">
+            <table className="min-w-full border border-gray-300 bg-white">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="py-2 px-4 border-b">#</th>
-                  <th className="py-2 px-4 border-b">Start Date</th>
-                  <th className="py-2 px-4 border-b">End Date</th>
-                  <th className="py-2 px-4 border-b">Total Reward</th>
-                  <th className="py-2 px-4 border-b">Reward / sec</th>
-                  <th className="py-2 px-4 border-b">Currently Staked</th>
+                  <th className="border-b px-4 py-2">#</th>
+                  <th className="border-b px-4 py-2">Start Date</th>
+                  <th className="border-b px-4 py-2">End Date</th>
+                  <th className="border-b px-4 py-2">Total Reward</th>
+                  <th className="border-b px-4 py-2">Reward / sec</th>
+                  <th className="border-b px-4 py-2">Currently Staked</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,18 +73,18 @@ const RewardPhaseTable = () => {
 
                   return (
                     <tr key={period.id} className="hover:bg-gray-50">
-                      <td className="py-2 px-4 border-b text-center">
+                      <td className="border-b px-4 py-2 text-center">
                         {period.id.toString()}
                       </td>
-                      <td className="py-2 px-4 border-b text-center">{ `${fromDate.toLocaleDateString()} ${fromDate.toLocaleTimeString()}`}</td>
-                      <td className="py-2 px-4 border-b text-center">{ `${toDate.toLocaleDateString()} ${toDate.toLocaleTimeString()}`}</td>
-                      <td className="py-2 px-4 border-b text-right">
+                      <td className="border-b px-4 py-2 text-center">{`${fromDate.toLocaleDateString()} ${fromDate.toLocaleTimeString()}`}</td>
+                      <td className="border-b px-4 py-2 text-center">{`${toDate.toLocaleDateString()} ${toDate.toLocaleTimeString()}`}</td>
+                      <td className="border-b px-4 py-2 text-right">
                         {format(period.reward)} OC
                       </td>
-                      <td className="py-2 px-4 border-b text-right">
+                      <td className="border-b px-4 py-2 text-right">
                         {format(period.reward / (period.to - period.from))} OC/s
                       </td>
-                      <td className="py-2 px-4 border-b text-right">
+                      <td className="border-b px-4 py-2 text-right">
                         {format(period.totalStaked)} EDU
                       </td>
                     </tr>

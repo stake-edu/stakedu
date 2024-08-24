@@ -34,10 +34,15 @@ const UpdateStakeForm: React.FC<{
     useWriteStakingPoolDepositAndStartStake();
 
   const isValid =
-    amount !== "" && balance !== undefined && parseEther(amount) <= balance;
+    amount !== "" &&
+    balance !== undefined &&
+    !Number.isNaN(Number(amount)) &&
+    parseEther(amount) <= balance;
 
   const isSufficientAllowance =
-    allowance?.data !== undefined && allowance?.data >= parseEther(amount);
+    allowance?.data !== undefined &&
+    !Number.isNaN(Number(amount)) &&
+    allowance?.data >= parseEther(amount);
 
   const getStakeError = (error: any): string => {
     switch (true) {
@@ -100,25 +105,31 @@ const UpdateStakeForm: React.FC<{
 
   return (
     <>
-      <div className="w-[400px] shadow-lg bg-purple-100 rounded-lg p-6">
-        <h1 className="text-center font-title text-lg font-bold mb-6">
+      <div className="rounded w-[520px] bg-purple-100 p-12 shadow-lg">
+        <h1 className="font-title mb-6 text-center text-lg font-bold ">
           {title}
         </h1>
-        <div className="flex justify-between mb-4">
-          <span className="text-base">Balance:</span>
+        <div className="mb-4 flex justify-between">
+          <span className="font-semibold">Balance:</span>
           <span className="text-base font-bold">
-            {format(balance)} <span className="text-sm">EDU</span>
+            <span className="font-semibold text-purple-800">
+              {format(balance)}
+            </span>
+            <span className="ml-2 text-sm pr-3 font-normal">EDU</span>
           </span>
         </div>
         <div className="relative mb-4">
           <input
             type="text"
-            className="w-full p-3 rounded-md bg-neutral-50 text-right"
+            className="w-full rounded-md bg-neutral-50 p-3 pr-12 text-right"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-sm">
+            <span className="">EDU</span>
+          </div>
         </div>
-        <div className="grid grid-cols-4 gap-2 mb-6">
+        <div className="mb-6 grid grid-cols-4 gap-2">
           {[25, 50, 75, 100].map((percentage) => (
             <button
               key={percentage}
@@ -128,7 +139,7 @@ const UpdateStakeForm: React.FC<{
                   formatEther((balance * BigInt(percentage)) / BigInt(100)),
                 )
               }
-              className="border-2 border-purple-600 text-purple-600 rounded-md py-2"
+              className="rounded-md border-2 border-purple-600 py-2 text-purple-600 font-semibold bg-purple-100"
             >
               {percentage === 100 ? "Max" : `${percentage}%`}
             </button>
@@ -143,7 +154,7 @@ const UpdateStakeForm: React.FC<{
                   args: [ADDRESS_POOL, parseEther(amount)],
                 });
               }}
-              className="bg-purple-600 text-white py-2 px-6 rounded-full"
+              className="rounded-md bg-purple-600 px-6 py-2 text-white w-1/2 font-semibold"
             >
               Approve
             </button>
@@ -153,9 +164,9 @@ const UpdateStakeForm: React.FC<{
             disabled={
               !(isValid && (formType === "unstake" || isSufficientAllowance))
             }
-            className={`bg-purple-600 text-white py-2 px-6 rounded-full ${
+            className={`rounded-md bg-purple-600 px-6 py-2 text-white w-1/2 font-semibold${
               !(isValid && (formType === "unstake" || isSufficientAllowance))
-                ? "opacity-50 cursor-not-allowed"
+                ? "cursor-not-allowed opacity-50"
                 : ""
             }`}
           >

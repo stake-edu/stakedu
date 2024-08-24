@@ -36,7 +36,7 @@ const IndexPage = () => {
     info: null,
   });
 
-  const handleSuccess = (result) => {
+  const handleSuccess = (result: string) => {
     setState((prevState) => ({
       ...prevState,
       info: {
@@ -46,7 +46,7 @@ const IndexPage = () => {
     }));
   };
 
-  const handleError = (error, message) => {
+  const handleError = (error: Error, message?: string) => {
     if (message) {
       setState((prevState) => ({ ...prevState, error: message }));
     } else if (error && error.message) {
@@ -65,7 +65,7 @@ const IndexPage = () => {
     <>
       <Header />
 
-      <div className={"mx-auto p-0 max-w-[1000px]"}>
+      <div>
         {error && (
           <AlertDismissible variant="error" title="Error">
             {" "}
@@ -78,18 +78,20 @@ const IndexPage = () => {
           </AlertDismissible>
         )}
 
-        <section className="bg-purple-100 p-6 rounded-lg mb-8">
-          <h2 className="font-title text-xl mb-6">My Dashboard</h2>
+        <section className="mx-auto my-8 max-w-screen-xl rounded bg-purple-100 p-16">
+          <h3 className="mb-8 text-lg font-bold">My Dashboard</h3>
           <Overview />
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="mt-8 grid grid-cols-2 gap-14">
             <div>
-              <h3 className="text-xl mb-4">Unstaked Balance</h3>
-              <div className="bg-neutral-50 p-4 rounded-md shadow-md flex items-center justify-between mb-4">
-                <span>Balance not yet staked</span>
-                <div className="text-2xl font-bold">
-                  {format(unstaked?.data)}{" "}
-                  <span className="text-base">EDU</span>
+              <h3 className="mb-4 text-lg font-bold">Unstaked Balance</h3>
+              <div className="mb-4 flex items-center justify-between rounded-md bg-neutral-50 p-4 font-semibold shadow-md">
+                Balance not yet staked
+                <div>
+                  <span className="text-2xl font-semibold text-purple-800">
+                    {format(unstaked?.data)}{" "}
+                  </span>
+                  <span className="ml-2 text-sm">EDU</span>
                 </div>
               </div>
               <StakeView
@@ -99,36 +101,44 @@ const IndexPage = () => {
                 handleError={handleError}
               />
             </div>
+
             <div>
-              <h3 className="text-xl mb-4">Rewards</h3>
-              <div className="bg-neutral-50 p-4 rounded-md shadow-md mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span>Current rewards rate (variable)</span>
-                  <span className="text-2xl font-bold">
+              <h2 className="mb-4 text-lg font-bold">Rewards</h2>
+              <div className="mb-4 rounded-md bg-neutral-50 p-4 shadow-sm">
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="font-semibold">
+                    Current rewards rate (variable)
+                  </div>
+                  <div className="flex-1 text-right text-xl font-semibold text-purple-800">
                     {format(
                       reward?.data?.rewardRate &&
-                        reward?.data.rewardRate * 60n * 60n * 24n,
-                    )}{" "}
-                    <span className="text-base">OC points/day</span>
-                  </span>
+                        reward?.data.rewardRate * BigInt(60 * 60 * 24),
+                    )}
+                  </div>
+                  <div className="ml-4 w-28 flex-none text-left">
+                    OC points/day
+                  </div>
                 </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span>Total rewards paid</span>
-                  <span className="text-2xl font-bold">
-                    {format(reward?.data?.totalRewardsPaid)}{" "}
-                    <span className="text-base">OC points</span>
-                  </span>
+
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="font-semibold">Total rewards paid</div>
+                  <div className="flex-1 text-right text-xl font-semibold text-purple-800">
+                    {format(reward?.data?.totalRewardsPaid)}
+                  </div>
+                  <div className="ml-4 w-28 flex-none text-left">OC points</div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span>Claimable rewards</span>
-                  <span className="text-2xl font-bold">
+              </div>
+              <div className="mb-4 rounded-md bg-neutral-50 p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold">Claimable rewards</div>
+                  <div className="flex-1 text-right text-xl font-semibold text-purple-800">
                     {format(reward?.data?.claimableRewards)}{" "}
-                    <span className="text-base">OC points</span>
-                  </span>
+                  </div>
+                  <div className="ml-4 w-28 flex-none text-left">OC points</div>
                 </div>
               </div>
               <button
-                className="bg-purple-600 text-white py-2 px-4 rounded-md w-full"
+                className="w-full rounded-md bg-purple-600 px-4 py-2 font-semibold text-white"
                 onClick={() =>
                   writeContractAsync({
                     address: ADDRESS_POOL,

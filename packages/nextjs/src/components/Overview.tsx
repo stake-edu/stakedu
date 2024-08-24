@@ -17,7 +17,7 @@ export default () => {
   });
   const period = useReadStakingRewardPoolRewardPeriods({
     address: ADDRESS_POOL,
-    args: [id?.data && id.data - BigInt(1)],
+    args: [(id?.data && id.data - BigInt(1))!],
   });
 
   const staked = useReadStakingPoolGetStakedBalance({
@@ -38,32 +38,39 @@ export default () => {
       : "0";
 
   return (
-    <div className="flex bg-neutral-50 p-6 rounded-md shadow-md">
-      <div className="flex-1 text-center">
-        <div className="text-lg">Total EDU staked</div>
-        <div className="text-3xl font-bold">
-          {format(period?.data?.totalStaked)}{" "}
-          <span className="text-base">EDU</span>
+    <div className="flex rounded bg-neutral-50 p-6 px-12 shadow-sm">
+      <div className="flex-1 text-left">
+        <div className="font-semibold">Total EDU staked</div>
+        <div>
+          <span className="text-2xl font-bold text-purple-800">
+            {format(period?.data?.totalStaked)}
+          </span>
+          <span className="ml-2 text-sm">EDU</span>
         </div>
       </div>
-      <div className="flex-1 text-center">
-        <div className="text-lg">My tokens staked</div>
-        <div className="text-3xl font-bold">
-          {format(staked?.data)} <span className="text-base">EDU</span>
+      <div className="flex-1 text-left">
+        <div className="font-semibold">My tokens staked</div>
+        <div>
+          <span className="text-2xl font-bold text-purple-800">
+            {format(staked?.data)}
+          </span>
+          <span className="ml-2 text-sm">EDU</span>
         </div>
       </div>
-      <div className="flex-1 text-center">
-        <div className="text-lg">My pool share</div>
-        <div className="text-3xl font-bold">
-          {share}
-          <span className="text-base">%</span>
+      <div className="flex-1 text-left">
+        <div className="font-semibold">My pool share</div>
+        <div>
+          <span className="text-2xl font-bold text-purple-800">{share}</span>
+          <span className="ml-2 text-sm">%</span>
         </div>
       </div>
-      <div className="flex-1 text-center">
-        <div className="text-lg">My rewards received</div>
-        <div className="text-3xl font-bold">
-          {format(reward?.data?.rewardsPaid)}{" "}
-          <span className="text-base">OC points</span>
+      <div className="flex-1 text-left">
+        <div className="font-semibold">My rewards received</div>
+        <div>
+          <span className="text-2xl font-bold text-purple-800">
+            {format(reward?.data?.rewardsPaid)}
+          </span>
+          <span className="ml-2 text-sm">OC points</span>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
-import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AppProps } from "next/app";
 import Head from "next/head";
 import { WagmiProvider } from "wagmi";
 
@@ -8,29 +9,22 @@ import "../css/global.css";
 import { getConfig } from "../wagmi";
 
 const queryClient = new QueryClient();
+const myTheme = lightTheme();
 
-function MyApp({ Component, pageProps }) {
+myTheme.colors.accentColor = "#9E00FF";
+myTheme.fonts.body = "Instrument Sans";
+myTheme.shadows.connectButton = "none";
+
+function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
         // Responsive meta tag
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        // bootstrap CDN
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
-          crossOrigin="anonymous"
-        />
-        <script
-          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
-          crossOrigin="anonymous"
-        ></script>
       </Head>
       <WagmiProvider config={getConfig()}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider>
+          <RainbowKitProvider theme={myTheme}>
             <Component {...pageProps} />
           </RainbowKitProvider>
         </QueryClientProvider>
