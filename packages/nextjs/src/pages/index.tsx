@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useAccount, useBalance } from "wagmi";
+import { useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
+import { useAccount, useBalance, useBlockNumber } from "wagmi";
 
 import { AlertDismissible } from "../components/AlertDismissible";
 import Header from "../components/Header";
@@ -30,6 +31,14 @@ const IndexPage = () => {
     address: ADDRESS_POOL,
     account: account.address,
   });
+
+  const queryClient = useQueryClient();
+  const { data: blockNumber } = useBlockNumber({ watch: true });
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: unstaked.queryKey });
+    queryClient.invalidateQueries({ queryKey: staked.queryKey });
+    queryClient.invalidateQueries({ queryKey: reward.queryKey });
+  }, [blockNumber, queryClient]);
 
   const { writeContractAsync } = useWriteStakingRewardPoolClaimReward();
 
@@ -67,7 +76,7 @@ const IndexPage = () => {
     <>
       <Header />
 
-      <div>
+      <div className="mx-auto max-w-screen-xl py-6">
         {error && (
           <AlertDismissible variant="error" title="Error">
             {" "}
@@ -75,7 +84,7 @@ const IndexPage = () => {
           </AlertDismissible>
         )}
         {info && (
-          <AlertDismissible variant="info" title={info.title}>
+          <AlertDismissible variant="success" title={info.title}>
             {info.detail}
           </AlertDismissible>
         )}

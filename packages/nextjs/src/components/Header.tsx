@@ -1,5 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 import logo from "../../public/logo.png";
@@ -10,7 +11,13 @@ const Header = () => {
       <div className="h-4 flex-1">
         <Image src={logo} alt="logo" height={30} />
       </div>
-      <div className="flex-none">
+      <div className="flex flex-none items-center">
+        <Link
+          href="https://docs.stakedu.com"
+          className="mr-4 text-sm font-semibold"
+        >
+          🔗 Docs
+        </Link>
         <ConnectButton showBalance={false} />
       </div>
     </div>

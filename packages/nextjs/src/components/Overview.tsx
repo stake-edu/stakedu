@@ -1,4 +1,6 @@
-import { useAccount } from "wagmi";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useAccount, useBlockNumber } from "wagmi";
 
 import { ADDRESS_POOL } from "../consts";
 import {
@@ -29,6 +31,13 @@ export default () => {
     address: ADDRESS_POOL,
     account: account.address,
   });
+
+  const queryClient = useQueryClient();
+  const { data: blockNumber } = useBlockNumber({ watch: true });
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: staked.queryKey });
+    queryClient.invalidateQueries({ queryKey: reward.queryKey });
+  }, [blockNumber, queryClient]);
 
   const share =
     staked?.data && period?.data && period?.data?.totalStaked > 0
